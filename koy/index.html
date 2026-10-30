@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ajan Köyü</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Silkscreen&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  :root { --bg:#0d0f1c; --panel:#161a2e; --line:#2a3050; --text:#e6e3d6; --muted:#8d90a8;
+          --amber:#f2b84b; --green:#7bd88f; --red:#ff6b6b; --blue:#7aa2ff; }
+  * { box-sizing:border-box; }
+  html,body { margin:0; height:100%; background:var(--bg); color:var(--text);
+              font-family:"JetBrains Mono", ui-monospace, monospace; }
+  .pix { font-family:"Silkscreen", "JetBrains Mono", monospace; letter-spacing:.5px; }
+  header { display:flex; align-items:center; gap:18px; padding:10px 18px; border-bottom:2px solid var(--line); }
+  header h1 { font-size:18px; margin:0; font-weight:400; color:var(--amber); }
+  header .bilgi { font-size:12px; color:var(--muted); display:flex; gap:16px; flex-wrap:wrap; }
+  header .bilgi b { color:var(--text); font-weight:600; }
+  main { display:grid; grid-template-columns:minmax(0,1fr) 380px; height:calc(100% - 50px); }
+  #sahne { position:relative; overflow:hidden; display:flex; align-items:center; justify-content:center; }
+  #kap { position:relative; }
+  canvas { display:block; image-rendering:pixelated; image-rendering:crisp-edges; }
+  .etiket { position:absolute; transform:translate(-50%,0); font-size:11px; padding:2px 6px; white-space:nowrap;
+            background:#1b1408cc; border:1px solid #6b4a1e; color:#f6d48f; cursor:pointer; user-select:none; }
+  .etiket.secili { border-color:var(--amber); color:#fff; }
+  .durum-etiket { position:absolute; transform:translate(-50%,0); font-size:10px; color:var(--muted);
+                  white-space:nowrap; pointer-events:none; }
+  .durum-etiket.calisiyor { color:var(--green); }
+  .rozet { position:absolute; transform:translate(-50%,-50%); min-width:20px; height:20px; border-radius:10px;
+           background:var(--amber); color:#2a1800; font-size:11px; font-weight:600; display:flex;
+           align-items:center; justify-content:center; padding:0 5px; border:2px solid #2a1800; pointer-events:none; }
+  aside { border-left:2px solid var(--line); background:var(--panel); overflow-y:auto; padding:16px 18px; }
+  aside h2 { font-size:15px; margin:0 0 4px; font-weight:400; color:var(--amber); }
+  aside .alt { font-size:11px; color:var(--muted); margin-bottom:12px; }
+  aside p { font-size:12px; line-height:1.6; margin:6px 0; }
+  .satir { display:flex; justify-content:space-between; font-size:12px; padding:5px 0; border-bottom:1px dashed var(--line); }
+  .satir span:first-child { color:var(--muted); }
+  .ok { color:var(--green); } .kotu { color:var(--red); } .bekle { color:var(--amber); }
+  button { font-family:inherit; font-size:12px; background:#2a2140; color:var(--text); border:2px solid #5b4a8a;
+           padding:7px 12px; cursor:pointer; margin-top:12px; }
+  button:hover { background:#3a2d5a; }
+  .cikti { border:1px solid var(--line); padding:8px 10px; margin:8px 0; cursor:pointer; font-size:12px; }
+  .cikti:hover { border-color:var(--amber); }
+  .cikti .ad { color:var(--blue); } .cikti .zaman { color:var(--muted); font-size:10px; }
+  .cikti .oz { color:var(--text); margin-top:4px; line-height:1.5; }
+  .cikti.yeni { border-color:var(--amber); }
+  #okuyucu { font-size:12px; line-height:1.6; }
+  #okuyucu h1,#okuyucu h2,#okuyucu h3 { font-size:13px; color:var(--amber); font-weight:600; }
+  #okuyucu a { color:var(--blue); word-break:break-all; }
+  #okuyucu table { border-collapse:collapse; font-size:11px; } #okuyucu td,#okuyucu th { border:1px solid var(--line); padding:3px 5px; }
+  #okuyucu pre { white-space:pre-wrap; }
+  .not { font-size:11px; color:var(--muted); margin-top:8px; }
+  .kuyruk { font-size:11px; color:var(--muted); margin:3px 0; }
+  @media (max-width: 900px) { main { grid-template-columns:1fr; grid-template-rows:60% 40%; } aside { border-left:0; border-top:2px solid var(--line); } }
+</style>
+</head>
+<body>
+<header>
+  <h1 class="pix">Ajan Köyü</h1>
+  <div class="bilgi">
+    <span>saat <b id="saat">--:--</b></span>
+    <span>mesai <b id="mesai">-</b></span>
+    <span>bugün <b id="maliyet">0.00</b> / <span id="tavan">10</span> USD</span>
+    <span>telegram <b id="telegram">-</b></span>
+  </div>
+</header>
+<main>
+  <section id="sahne"><div id="kap"><canvas id="c"></canvas></div></section>
+  <aside id="panel">
+    <h2 class="pix">Hoş geldin, Duru</h2>
+    <div class="alt">bir binaya ya da ajana tıkla</div>
+    <p>Dört ajanın köyde yaşıyor. Çalışırken binalarının önünde koşturuyorlar; yeni bir çıktı ürettiklerinde
+       bir zarf merkezdeki evine uçar ve binanın üstünde sarı bir rozet belirir.</p>
+    <p class="not">Bu sayfa yalnız okur. "Şimdi çalıştır" düğmesi terminaldeki <code>kos.py</code> ile aynı yoldan geçer;
+       mesai ve bütçe tavanlarını aşamaz.</p>
+  </aside>
+</main>
+<script src="https://cdn.jsdelivr.net/npm/marked@12/marked.min.js"></script>
+<script>
+"use strict";
+const W = 400, H = 250;
+const cv = document.getElementById("c"), ctx = cv.getContext("2d");
+const kap = document.getElementById("kap");
+let olcek = 3;
+
+// --- yerleşim (dünya koordinatı) --------------------------------------------
+const MERKEZ = { x: 200, y: 132 };
+const YER = {
+  "ilan-avcisi":    { x: 82,  y: 70,  renk: "#5aa9e6", aks: "#cfe8ff" },
+  "fikir-atolyesi": { x: 318, y: 70,  renk: "#c792ea", aks: "#ffe27a" },
+  "basvuru-takip":  { x: 82,  y: 198, renk: "#ef8f5d", aks: "#fff1d6" },
+  "voltyol-bekci":  { x: 318, y: 198, renk: "#6fd39a", aks: "#d8ff8a" },
+};
+
+// --- yıldızlar --------------------------------------------------------------
+const yildizlar = Array.from({ length: 70 }, (_, i) => ({
+  x: (i * 97) % W, y: (i * 53 + (i % 7) * 11) % H, f: (i % 5) / 5 }));
+
+function px(x, y, w, h, c) { ctx.fillStyle = c; ctx.fillRect(Math.round(x), Math.round(y), w, h); }
+
+function ada(x, y, rx, ry) {
+  for (let dy = -ry; dy <= ry; dy++) {
+    const yar = Math.round(rx * Math.sqrt(1 - (dy * dy) / (ry * ry)));
+    px(x - yar, y + dy, yar * 2, 1, dy > ry - 4 ? "#2a1d14" : "#3b2a1c");
+  }
+  for (let dy = -ry; dy <= ry; dy++) {
+    const yar = Math.round(rx * Math.sqrt(1 - (dy * dy) / (ry * ry)));
+    px(x - yar, y + dy, 1, 1, "#57402a"); px(x + yar - 1, y + dy, 1, 1, "#57402a");
+  }
+  const tohum = x * 7 + y * 13;
+  for (let i = 0; i < 14; i++) {
+    const a = (tohum + i * 37) % 360 * Math.PI / 180, r = 0.35 + ((i * 29) % 50) / 100;
+    px(x + Math.cos(a) * rx * r, y + Math.sin(a) * ry * r, 1, 1, i % 3 ? "#6b8f4e" : "#d9a55b");
+  }
+}
+
+function yol(x1, y1, x2, y2) {
+  const n = Math.hypot(x2 - x1, y2 - y1);
+  for (let i = 0; i < n; i += 5) {
+    const t = i / n;
+    px(x1 + (x2 - x1) * t, y1 + (y2 - y1) * t, 3, 2, "#6b4a26");
+  }
+}
+
+// --- binalar (her biri kendi çizimi) ----------------------------------------
+function kule(x, y, z, aktif) {       // gözetleme kulesi
+  const b = y - 6;
+  px(x - 9, b - 34, 18, 34, "#7d7f8c"); px(x - 9, b - 34, 2, 34, "#9a9cab"); px(x + 7, b - 34, 2, 34, "#5c5e6b");
+  for (let i = 0; i < 5; i++) px(x - 11 + i * 5, b - 40, 3, 6, "#8a8c99");
+  px(x - 11, b - 36, 22, 3, "#6c6e7b");
+  for (let r = 0; r < 4; r++) px(x - 9, b - 30 + r * 8, 18, 1, "#6b6d79");
+  px(x - 3, b - 26, 6, 7, aktif ? "#ffd36b" : "#3a2f20"); px(x - 3, b - 14, 6, 9, "#2b1d12");
+  px(x, b - 52, 1, 12, "#c9c9c9");
+  const dalga = Math.sin(z / 300) > 0 ? 1 : 0;
+  px(x + 1, b - 52, 7, 4 + dalga, "#5aa9e6");
+  if (aktif) { const a = (z / 600) % (Math.PI * 2);   // dönen dürbün ışığı
+    for (let i = 4; i < 20; i += 2) px(x + Math.cos(a) * i, b - 44 + Math.sin(a) * i * 0.4, 1, 1, "#fff3b0"); }
+}
+
+function postane(x, y, z, aktif) {
+  const b = y - 6;
+  px(x - 18, b - 20, 36, 20, "#b98a5a"); px(x - 18, b - 20, 36, 2, "#d3a575");
+  for (let i = 0; i < 12; i++) px(x - 21 + i, b - 21 - i, 42 - i * 2, 1, i % 2 ? "#a8452f" : "#c0553a");
+  px(x - 4, b - 12, 8, 12, "#4a2c18"); px(x + 2, b - 6, 1, 1, "#f2b84b");
+  px(x - 14, b - 15, 6, 5, aktif ? "#ffd36b" : "#3a2f20"); px(x + 8, b - 15, 6, 5, aktif ? "#ffd36b" : "#3a2f20");
+  px(x - 6, b - 29, 12, 7, "#fff1d6"); px(x - 6, b - 29, 12, 1, "#c8b89a");
+  for (let i = 0; i < 6; i++) px(x - 6 + i, b - 28 + Math.floor(i / 2), 1, 1, "#b0a080"), px(x + 5 - i, b - 28 + Math.floor(i / 2), 1, 1, "#b0a080");
+  px(x + 22, b - 10, 2, 10, "#555"); px(x + 20, b - 15, 7, 5, "#c0392b"); px(x + 20, b - 15, 7, 1, "#e05a4a");
+}
+
+function atolye(x, y, z, aktif) {      // fikir atölyesi: ahşap kulübe + ampul
+  const b = y - 6;
+  px(x - 17, b - 18, 34, 18, "#7a5232");
+  for (let r = 0; r < 6; r++) px(x - 17, b - 18 + r * 3, 34, 1, "#694529");
+  for (let i = 0; i < 11; i++) px(x - 20 + i, b - 19 - i, 40 - i * 2, 1, i % 2 ? "#4b3b6b" : "#5a4880");
+  px(x - 4, b - 11, 8, 11, "#3a2414");
+  px(x - 14, b - 14, 6, 5, aktif ? "#ffe27a" : "#3a2f20"); px(x + 8, b - 14, 6, 5, aktif ? "#ffe27a" : "#3a2f20");
+  const parla = aktif ? (Math.sin(z / 200) > 0 ? "#fff6b0" : "#ffe27a") : "#8a8460";
+  px(x - 1, b - 33, 2, 3, "#888"); px(x - 4, b - 41, 8, 8, parla); px(x - 3, b - 42, 6, 1, parla); px(x - 3, b - 33, 6, 1, "#777");
+  if (aktif) for (let i = 0; i < 8; i++) { const a = i * Math.PI / 4 + z / 900;
+    px(x + Math.cos(a) * 9, b - 37 + Math.sin(a) * 9, 1, 1, "#fff3b0"); }
+}
+
+function sarj(x, y, z, aktif) {         // Voltyol şarj istasyonu
+  const b = y - 6;
+  px(x - 22, b - 30, 44, 4, "#2f6f4f"); px(x - 22, b - 30, 44, 1, "#4fa37a");
+  px(x - 20, b - 26, 2, 26, "#888"); px(x + 18, b - 26, 2, 26, "#888");
+  px(x - 9, b - 20, 10, 20, "#d9d9d9"); px(x - 9, b - 20, 10, 1, "#fff");
+  px(x - 7, b - 17, 6, 5, aktif ? "#7bff9b" : "#2f5a3c");
+  px(x - 5, b - 16, 2, 2, "#1c3a26"); px(x - 4, b - 14, 2, 2, "#1c3a26");
+  px(x + 1, b - 10, 4, 1, "#333"); px(x + 4, b - 10, 1, 6, "#333");
+  px(x + 5, b - 9, 12, 6, "#3b6fb6"); px(x + 7, b - 12, 7, 3, "#4f86d1"); px(x + 6, b - 3, 2, 2, "#111"); px(x + 14, b - 3, 2, 2, "#111");
+  px(x - 12, b - 36, 24, 6, "#1a2a20"); px(x - 12, b - 36, 24, 1, "#4fa37a");
+  for (let i = 0; i < 7; i++) px(x - 9 + i * 3, b - 34, 2, 2, aktif && Math.floor(z / 150) % 7 === i ? "#d8ff8a" : "#6fd39a");
+}
+
+function ev(x, y, z) {                  // merkez: Duru'nun evi
+  const b = y - 4;
+  px(x - 20, b - 20, 40, 20, "#d8c3a0"); px(x - 20, b - 20, 40, 2, "#efe0c2");
+  for (let i = 0; i < 13; i++) px(x - 23 + i, b - 21 - i, 46 - i * 2, 1, i % 2 ? "#3f5f8f" : "#4a6fa5");
+  px(x + 9, b - 36, 5, 10, "#7a6a5a");
+  for (let i = 0; i < 4; i++) { const t = ((z / 40 + i * 25) % 100) / 100;
+    px(x + 11 + Math.sin(t * 6 + i) * 2, b - 38 - t * 18, 2, 2, `rgba(200,200,210,${1 - t})`); }
+  px(x - 4, b - 13, 8, 13, "#5a3a22"); px(x + 2, b - 7, 1, 1, "#f2b84b");
+  px(x - 16, b - 15, 7, 6, "#ffd36b"); px(x + 9, b - 15, 7, 6, "#ffd36b");
+  px(x - 13, b - 15, 1, 6, "#8a6a3a"); px(x + 12, b - 15, 1, 6, "#8a6a3a");
+  px(x - 30, b - 14, 1, 14, "#555"); px(x - 32, b - 17, 5, 3, "#ffe7a0");
+}
+
+const CIZIM = { "ilan-avcisi": kule, "basvuru-takip": postane, "fikir-atolyesi": atolye, "voltyol-bekci": sarj };
+
+// --- ajanlar (özgün 10x12 piksel karakter) ----------------------------------
+const GOVDE = [
+  "....aa....",
+  "....aa....",
+  ".....s....",
+  "..BBBBBB..",
+  ".BBBBBBBB.",
+  ".BwwBBwwB.",
+  ".BwkBBwkB.",
+  ".BBBBBBBB.",
+  ".BBpppBBB.",
+  "..BBBBBB..",
+  "..L....L..",
+  ".LL....LL.",
+];
+const KOYU = { "ilan-avcisi": "#3d7cb0", "fikir-atolyesi": "#9566c0", "basvuru-takip": "#c56a3d", "voltyol-bekci": "#3fa56c" };
+
+const S = 2;   // ajanlar binalara göre küçük kalmasın: her karakter pikseli 2x2 dünya pikseli
+function sp(x, y, i, j, w, h, c) { px(x + i * S, y + j * S, w * S, h * S, c); }
+
+function aksesuar(id, x, y) {
+  if (id === "ilan-avcisi") { sp(x, y, 1, 5, 3, 2, "#222"); sp(x, y, 6, 5, 3, 2, "#222"); sp(x, y, 4, 5, 2, 1, "#222"); }
+  if (id === "basvuru-takip") { sp(x, y, 2, 2, 6, 2, "#2b4a8a"); sp(x, y, 1, 3, 8, 1, "#2b4a8a"); sp(x, y, 8, 7, 3, 3, "#fff1d6"); }
+  if (id === "fikir-atolyesi") { sp(x, y, 2, 2, 6, 1, "#5a3a22"); sp(x, y, 3, 1, 4, 1, "#5a3a22"); }
+  if (id === "voltyol-bekci") { sp(x, y, 4, 7, 2, 1, "#ffe27a"); sp(x, y, 3, 8, 2, 1, "#ffe27a"); sp(x, y, 5, 8, 1, 1, "#ffe27a"); }
+}
+
+function ajan(id, x, y, z, durum) {
+  const r = YER[id], kirp = Math.floor(z / 180) % 2;
+  const bob = durum === "uyku" ? 0 : (Math.sin(z / 260 + x) > 0 ? 1 : 0);
+  const renk = { a: r.aks, s: "#cccccc", B: r.renk, w: "#ffffff", k: "#1a1a2a", p: KOYU[id], L: KOYU[id] };
+  if (durum === "uyku") { renk.k = r.renk; renk.w = KOYU[id]; }
+  else if (Math.floor(z / 2600) % 7 === 0 && Math.floor(z / 120) % 2) renk.k = renk.w;   // göz kırpma
+  sp(x, y, 1, 12, 8, 1, "#1a120c");
+  GOVDE.forEach((satir, j) => {
+    [...satir].forEach((h, i) => {
+      if (h === ".") return;
+      let jj = j - bob;
+      if (h === "L" && durum === "calisiyor") jj += (i < 5 ? kirp : 1 - kirp);
+      sp(x, y, i, jj, 1, 1, renk[h]);
+    });
+  });
+  aksesuar(id, x, y - bob * S);
+  if (durum === "uyku") {
+    const t = (z / 900) % 1; ctx.globalAlpha = 1 - t;
+    ctx.fillStyle = "#b7b9d6"; ctx.font = "8px Silkscreen, monospace"; ctx.fillText("z", x + 21, y - 2 - t * 10);
+    ctx.globalAlpha = 1;
+  }
+  if (durum === "calisiyor") for (let i = 0; i < 3; i++) {
+    const a = z / 250 + i * 2.1; px(x + 10 + Math.cos(a) * 16, y + 10 + Math.sin(a) * 10, 2, 2, r.aks);
+  }
+}
+
+// --- durum ------------------------------------------------------------------
+let veri = null, secili = null, ucanlar = [];
+const goruldu = JSON.parse(safeGet("koy-goruldu") || "{}");
+const oncekiCikti = {};
+
+function safeGet(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }
+function safeSet(k, v) { try { localStorage.setItem(k, v); } catch (e) {} }
+
+function yeniSayisi(t) {
+  const son = goruldu[t.id] || "";
+  return t.ciktilar.filter(c => c.zaman > son).length;
+}
+
+function ajanDurumu(t) {
+  if (t.calisiyor) return "calisiyor";
+  if (!veri || !veri.mesai) return "uyku";
+  return "bos";
+}
+
+// --- çizim döngüsü ------------------------------------------------------------
+function ciz(z) {
+  px(0, 0, W, H, "#0d0f1c");
+  yildizlar.forEach(s => { if ((Math.sin(z / 700 + s.f * 9) + 1) / 2 > 0.35) px(s.x, s.y, 1, 1, s.f > 0.6 ? "#c9cbe8" : "#5b5e86"); });
+  Object.values(YER).forEach(r => yol(r.x, r.y, MERKEZ.x, MERKEZ.y));
+  ada(MERKEZ.x, MERKEZ.y + 4, 48, 18);
+  Object.values(YER).forEach(r => ada(r.x, r.y + 4, 54, 20));
+  ev(MERKEZ.x, MERKEZ.y, z);
+  if (veri) veri.takimlar.forEach(t => {
+    const r = YER[t.id]; if (!r) return;
+    const d = ajanDurumu(t);
+    CIZIM[t.id](r.x, r.y, z, d === "calisiyor");
+    let ax = r.x + 24, ay = r.y - 20;
+    if (d === "calisiyor") ax = r.x - 40 + ((Math.sin(z / 900) + 1) / 2) * 62;
+    ajan(t.id, Math.round(ax), ay, z, d);
+    if (secili === t.id) { px(r.x - 30, r.y + 22, 60, 1, "#f2b84b"); }
+  });
+  ucanlar = ucanlar.filter(u => {
+    const t = Math.min(1, (z - u.bas) / 1600), e = t * t * (3 - 2 * t);
+    const x = u.x + (MERKEZ.x - u.x) * e, y = u.y + (MERKEZ.y - 20 - u.y) * e - Math.sin(t * Math.PI) * 30;
+    px(x - 3, y - 2, 7, 5, "#fff1d6"); px(x - 3, y - 2, 7, 1, "#c8b89a"); px(x, y, 1, 1, "#c0553a");
+    return t < 1;
+  });
+  requestAnimationFrame(ciz);
+}
+
+// --- DOM katmanı (etiketler, rozetler) ----------------------------------------
+const katman = {};
+function katmanKur() {
+  Object.keys(YER).forEach(id => {
+    const e = document.createElement("div"); e.className = "etiket pix"; e.onclick = () => sec(id);
+    const d = document.createElement("div"); d.className = "durum-etiket";
+    const r = document.createElement("div"); r.className = "rozet"; r.style.display = "none";
+    kap.append(e, d, r); katman[id] = { e, d, r };
+  });
+  const ev = document.createElement("div"); ev.className = "etiket pix"; ev.textContent = "Duru'nun evi";
+  ev.onclick = () => genelPanel(); kap.append(ev); katman._ev = ev;
+  cv.addEventListener("click", ev2 => {
+    const b = cv.getBoundingClientRect(), x = (ev2.clientX - b.left) / olcek, y = (ev2.clientY - b.top) / olcek;
+    for (const [id, r] of Object.entries(YER)) if (Math.abs(x - r.x) < 50 && Math.abs(y - r.y) < 40) return sec(id);
+    if (Math.abs(x - MERKEZ.x) < 40 && Math.abs(y - MERKEZ.y) < 30) genelPanel();
+  });
+}
+
+function konumla() {
+  const yer = (el, x, y) => { el.style.left = x * olcek + "px"; el.style.top = y * olcek + "px"; };
+  Object.entries(YER).forEach(([id, r]) => {
+    const k = katman[id]; yer(k.e, r.x, r.y + 26); yer(k.d, r.x, r.y + 26 + 18 / olcek * 1.2); yer(k.r, r.x + 14, r.y - 52);
+  });
+  yer(katman._ev, MERKEZ.x, MERKEZ.y + 24);
+}
+
+function boyutla() {
+  const s = document.getElementById("sahne");
+  olcek = Math.max(1, Math.floor(Math.min(s.clientWidth / W, s.clientHeight / H) * 2) / 2);
+  cv.width = W; cv.height = H; cv.style.width = W * olcek + "px"; cv.style.height = H * olcek + "px";
+  ctx.imageSmoothingEnabled = false; konumla();
+}
+
+// --- panel ------------------------------------------------------------------
+const panel = document.getElementById("panel");
+const SONUC = { tamam: ["ok", "tamam"], red: ["kotu", "bekçi reddetti"], hata: ["kotu", "hata"], atlandi: ["bekle", "atlandı"] };
+function esc(s) { return String(s ?? "").replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c])); }
+function saat(iso) { if (!iso) return "henüz yok"; const d = new Date(iso); return d.toLocaleString("tr-TR", { day: "2-digit", month: "short", hour: "2-digit", minute: "2-digit" }); }
+
+function genelPanel() {
+  secili = null; Object.values(katman).forEach(k => k.e && k.e.classList.remove("secili"));
+  const toplam = veri ? veri.takimlar.reduce((a, t) => a + yeniSayisi(t), 0) : 0;
+  panel.innerHTML = `<h2 class="pix">Duru'nun evi</h2><div class="alt">köyün özeti</div>
+    <div class="satir"><span>okunmamış çıktı</span><span class="${toplam ? "bekle" : ""}">${toplam}</span></div>
+    ${veri ? veri.takimlar.map(t => `<div class="satir"><span>${esc(t.rozet)} ${esc(t.ad)}</span>
+      <span class="${t.calisiyor ? "ok" : ""}">${t.calisiyor ? "çalışıyor" : saat(t.son_kosu)}</span></div>`).join("") : ""}
+    <p class="not">Telegram'dan yazabileceklerin: "ilan bak", bir ilan linki, "başvurdum 3", "Getir'den mülakat geldi",
+    "fikir: tarım", "voltyol site nasıl".</p>`;
+}
+
+function sec(id) {
+  secili = id; Object.entries(katman).forEach(([k, v]) => v.e && v.e.classList.toggle("secili", k === id));
+  panelCiz();
+}
+
+function panelCiz() {
+  if (!veri || !secili) return;
+  const t = veri.takimlar.find(x => x.id === secili); if (!t) return;
+  const [sinif, metin] = SONUC[t.son_sonuc] || ["", t.son_sonuc || "—"];
+  const son = goruldu[t.id] || "";
+  panel.innerHTML = `
+    <h2 class="pix">${esc(t.rozet)} ${esc(t.ad)}</h2><div class="alt">${esc(t.bina)} · ${esc(t.id)}</div>
+    <p>${esc(t.gorev)}</p>
+    <div class="satir"><span>durum</span><span class="${t.calisiyor ? "ok" : ""}">${t.calisiyor ? "çalışıyor…" : (veri.mesai ? "boşta" : "uyuyor (mesai dışı)")}</span></div>
+    <div class="satir"><span>plan</span><span style="text-align:right;max-width:230px">${esc(t.plan)}</span></div>
+    <div class="satir"><span>son koşu</span><span>${saat(t.son_kosu)}</span></div>
+    <div class="satir"><span>sonuç</span><span class="${sinif}">${esc(metin)}</span></div>
+    <div class="satir"><span>bekçi</span><span>${esc(t.bekci || "—")}</span></div>
+    <div class="satir"><span>bugün</span><span>${t.bugun} / ${veri.kosu_tavani} koşu</span></div>
+    ${t.bekleyen.length ? `<div class="not">kuyrukta bekleyen:</div>` + t.bekleyen.map(o => `<div class="kuyruk">• ${esc(o.id)} — ${esc(o.not || "")}</div>`).join("") : ""}
+    <button id="kosBtn">Şimdi çalıştır</button>
+    <div class="not" id="kosNot">${t.tetik.kossun || /bekleyen madde yok/.test(t.tetik.sebep) ? "" : "şu an başlamaz: " + esc(t.tetik.sebep)}</div>
+    <h2 class="pix" style="margin-top:18px">Çıktılar</h2>
+    ${t.ciktilar.length ? t.ciktilar.map(c => `<div class="cikti ${c.zaman > son ? "yeni" : ""}" data-d="${esc(c.dosya)}">
+      <div class="ad">${esc(c.dosya)}</div><div class="zaman">${saat(c.zaman)}</div>
+      <div class="oz">${esc(c.ozet)}</div></div>`).join("") : `<p class="not">Henüz çıktı yok — ilk koşudan sonra burada görünür.</p>`}
+    <div id="okuyucu"></div>`;
+  document.getElementById("kosBtn").onclick = async () => {
+    const r = await fetch(`/api/kos/${t.id}`, { method: "POST" }).then(r => r.json()).catch(() => ({ mesaj: "köy sunucusuna ulaşılamadı" }));
+    document.getElementById("kosNot").textContent = r.mesaj; yokla();
+  };
+  panel.querySelectorAll(".cikti").forEach(el => el.onclick = () => oku(t, el.dataset.d));
+  if (t.ciktilar[0]) { goruldu[t.id] = t.ciktilar[0].zaman; safeSet("koy-goruldu", JSON.stringify(goruldu)); rozetler(); }
+}
+
+async function oku(t, dosya) {
+  const metin = await fetch(`/api/cikti/${t.id}/${encodeURIComponent(dosya)}`).then(r => r.text());
+  const ok = document.getElementById("okuyucu");
+  ok.innerHTML = window.marked ? marked.parse(esc(metin).replace(/&gt;/g, ">")) : `<pre>${esc(metin)}</pre>`;
+  ok.querySelectorAll("a").forEach(a => { a.target = "_blank"; a.rel = "noopener"; });
+  ok.scrollIntoView({ behavior: "smooth" });
+}
+
+function rozetler() {
+  if (!veri) return;
+  veri.takimlar.forEach(t => {
+    const k = katman[t.id]; if (!k) return;
+    k.e.textContent = t.bina;
+    const d = ajanDurumu(t);
+    k.d.textContent = d === "calisiyor" ? "● çalışıyor" : (d === "uyku" ? "uyuyor" : `${t.ad} · ${t.son_kosu ? saat(t.son_kosu) : "bekliyor"}`);
+    k.d.className = "durum-etiket" + (d === "calisiyor" ? " calisiyor" : "");
+    const n = yeniSayisi(t); k.r.style.display = n ? "flex" : "none"; k.r.textContent = n;
+  });
+}
+
+async function yokla() {
+  try {
+    const yeni = await fetch("/api/koy").then(r => r.json());
+    yeni.takimlar.forEach(t => {
+      const ilk = t.ciktilar[0] && t.ciktilar[0].zaman;
+      if (oncekiCikti[t.id] !== undefined && ilk && ilk !== oncekiCikti[t.id] && YER[t.id])
+        ucanlar.push({ x: YER[t.id].x, y: YER[t.id].y - 30, bas: performance.now() });
+      oncekiCikti[t.id] = ilk || null;
+    });
+    veri = yeni;
+    document.getElementById("mesai").textContent = veri.mesai ? `açık (${veri.mesai_metni})` : `kapalı (${veri.mesai_metni})`;
+    document.getElementById("maliyet").textContent = veri.maliyet.toFixed(2);
+    document.getElementById("tavan").textContent = veri.tavan;
+    document.getElementById("telegram").textContent = veri.telegram ? "bağlı" : "kurulu değil";
+    rozetler(); if (secili) { const sakla = document.getElementById("okuyucu"); if (!sakla || !sakla.innerHTML) panelCiz(); }
+  } catch (e) { document.getElementById("mesai").textContent = "sunucu yok"; }
+}
+
+setInterval(() => { document.getElementById("saat").textContent = new Date().toLocaleTimeString("tr-TR", { hour: "2-digit", minute: "2-digit" }); }, 1000);
+katmanKur(); boyutla(); addEventListener("resize", boyutla);
+yokla(); setInterval(yokla, 5000);
+requestAnimationFrame(ciz);
+</script>
+</body>
+</html>
