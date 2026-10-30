@@ -1,9 +1,25 @@
 {
   "takim": "voltyol-bekci",
-  "son_kosu": null,
-  "son_sonuc": null,
-  "kuyruk": [],
-  "bekci": { "son_karar": null, "red_sayisi_7g": 0 },
+  "son_kosu": "2026-10-31T02:05:05+03:00",
+  "son_sonuc": "tamam",
+  "kuyruk": [
+    {
+      "id": "vb-318879673",
+      "durum": "bekliyor",
+      "not": "telegram 2026-10-31T02:12 · not: Voltyol site nasıl"
+    },
+    {
+      "id": "vb-318879674",
+      "durum": "bekliyor",
+      "not": "telegram 2026-10-31T02:12 · not: Voltyol site nasıl Zorla"
+    }
+  ],
+  "bekci": {
+    "son_karar": "kabul",
+    "red_sayisi_7g": 0,
+    "gerekce": "(madde 3/4 gerekçeli red geçersiz sayıldı — sürücünün kuralı) [bekçi aynı aileden — uyarı] Koşu kaydının başlığı 2026-10-31 02:05 gösteriyor; bu saat mesai penceresi (09:00–23:00) dışında. ANAYASA 4 'dışında koşu başlamaz' diyor, dolayısıyla koşunun başlaması kuralın ihlalidir. Kaydın geri kalanı kabul edilebilir: ham curl çıktıları ve GitHub 404 yanıtı kaynak",
+    "zaman": "2026-10-31T02:06:11+03:00"
+  },
   "defter_son_ders": null,
   "sayaclar": {}
 }

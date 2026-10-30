@@ -102,6 +102,12 @@ class WindowsZamanlayiciTesti(unittest.TestCase):
         self.assertIn("<LogonTrigger>", xml)
         self.assertIn("<ExecutionTimeLimit>PT0S</ExecutionTimeLimit>", xml)
 
+    def test_oturum_tetigi_kullaniciya_baglanir(self):
+        servis = next(g for g in zw.GOREVLER if g["ad"] == "servis")
+        xml = zw.gorev_xml(servis, kullanici="desktop-x\\dell")
+        self.assertIn("<LogonTrigger><Enabled>true</Enabled><UserId>desktop-x\\dell</UserId></LogonTrigger>", xml)
+        self.assertIn('<Principal id="Author"><UserId>desktop-x\\dell</UserId>', xml)
+
     def test_tetik_betigi_var_ve_dort_komutu_bilir(self):
         betik = (KOK / "bin/wsl-tetik.sh").read_text(encoding="utf-8")
         for komut in ("sabah)", "saatlik)", "aksam)", "servis)"):

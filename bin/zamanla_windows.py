@@ -51,6 +51,16 @@ def dagitim_adi():
     return os.environ.get("WSL_DISTRO_NAME") or "Ubuntu"
 
 
+def windows_kullanicisi():
+    """`BILGISAYAR\\kullanici` — görevler bu hesaba bağlanır. Oturum tetiği kullanıcısız olursa
+    Windows onu "herkes için" sayar ve yönetici izni ister ("Erişim engellendi")."""
+    try:
+        cikti = subprocess.run(["whoami.exe"], capture_output=True, timeout=15).stdout
+    except (OSError, subprocess.SubprocessError):
+        return ""
+    return cikti.decode("utf-8", errors="replace").strip()
+
+
 def _windows_yolu(yol):
     """WSL yolunu Windows yoluna çevirir (wslpath -w)."""
     return subprocess.run(["wslpath", "-w", str(yol)], capture_output=True, text=True,
@@ -63,11 +73,13 @@ def komut_argumanlari(gorev):
     return f"--headless wsl.exe -d {dagitim_adi()} -- {betik} {gorev['ad']}"
 
 
-def gorev_xml(gorev, simdi=None):
-    """Görev Zamanlayıcı XML'i (UTF-16 ile yazılır). StartWhenAvailable açık, aynı anda tek örnek."""
+def gorev_xml(gorev, simdi=None, kullanici=""):
+    """Görev Zamanlayıcı XML'i (UTF-16 ile yazılır). StartWhenAvailable açık, aynı anda tek örnek.
+    `kullanici` verilirse görev ve oturum tetiği o hesaba bağlanır (yönetici izni gerekmez)."""
     tarih = (simdi or datetime.now()).strftime("%Y-%m-%d")
+    kim = f"<UserId>{escape(kullanici)}</UserId>" if kullanici else ""
     if gorev["tetik"] == "oturum":
-        tetik = "<LogonTrigger><Enabled>true</Enabled></LogonTrigger>"
+        tetik = f"<LogonTrigger><Enabled>true</Enabled>{kim}</LogonTrigger>"
         sinir = "PT0S"   # servis süresiz çalışır
     else:
         tekrar = ""
@@ -82,7 +94,7 @@ def gorev_xml(gorev, simdi=None):
 <Task version="1.4" xmlns="http://schemas.microsoft.com/windows/2004/02/mit/task">
   <RegistrationInfo><Description>Ajan Köyü — {escape(gorev['ne'])}</Description></RegistrationInfo>
   <Triggers>{tetik}</Triggers>
-  <Principals><Principal id="Author"><LogonType>InteractiveToken</LogonType><RunLevel>LeastPrivilege</RunLevel></Principal></Principals>
+  <Principals><Principal id="Author">{kim}<LogonType>InteractiveToken</LogonType><RunLevel>LeastPrivilege</RunLevel></Principal></Principals>
   <Settings>
     <MultipleInstancesPolicy>IgnoreNew</MultipleInstancesPolicy>
     <DisallowStartIfOnBatteries>false</DisallowStartIfOnBatteries>
@@ -115,10 +127,11 @@ def tam_ad(gorev):
 def kur():
     os.chmod(KOK / "bin" / "wsl-tetik.sh", 0o755)
     (KOK / "sirket-log").mkdir(exist_ok=True)
+    kullanici = windows_kullanicisi()
     sonuclar = []
     for gorev in GOREVLER:
         with tempfile.NamedTemporaryFile("wb", suffix=".xml", delete=False, dir=KOK / "sirket-log") as dosya:
-            dosya.write(gorev_xml(gorev).encode("utf-16"))
+            dosya.write(gorev_xml(gorev, kullanici=kullanici).encode("utf-16"))
             yol = Path(dosya.name)
         kod, cikti = _schtasks("/Create", "/F", "/TN", tam_ad(gorev), "/XML", _windows_yolu(yol))
         yol.unlink(missing_ok=True)
