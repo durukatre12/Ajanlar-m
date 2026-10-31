@@ -6,6 +6,9 @@
   aksam    22:00                 → `bin/wsl-tetik.sh aksam`   günün denetimi
   servis   oturum açılınca       → `bin/wsl-tetik.sh servis`  köy (localhost:8765) + Telegram dinleyici
 
+`servis` Görev Zamanlayıcı'ya değil, Windows **Başlangıç** klasörüne gizli bir `.vbs` olarak yazılır:
+oturum tetikli görev oluşturmak Windows'ta yönetici izni ister, Başlangıç klasörü istemez.
+
 Neden WSL içinden Windows görevi: WSL'de cron, WSL kapalıyken çalışmaz. Görev Zamanlayıcı ise
 saat gelince WSL'i kendisi açar; bilgisayar o saatte uykudaysa açılınca kaçan görevi koşturur
 (StartWhenAvailable). Görevler `conhost --headless` ile açılır — ekranda pencere belirmez.
@@ -38,6 +41,8 @@ GOREVLER = [
     {"ad": "aksam", "tetik": "takvim", "saat": f"{ayar.MESAI_BITIS - 1:02d}:00", "ne": "günün denetimi"},
     {"ad": "servis", "tetik": "oturum", "ne": "köy + Telegram dinleyici"},
 ]
+TAKVIM = [g for g in GOREVLER if g["tetik"] == "takvim"]
+BASLANGIC_DOSYASI = "AjanKoyu-servis.vbs"
 
 
 def wsl_mi():
@@ -120,6 +125,22 @@ def _schtasks(*argv):
     return sonuc.returncode, cikti
 
 
+def servis_vbs():
+    """Başlangıç klasörüne konan betik: WSL'de servisi pencere açmadan (0 = gizli) başlatır."""
+    betik = KOK / "bin" / "wsl-tetik.sh"
+    komut = f"wsl.exe -d {dagitim_adi()} -- {betik} servis"
+    return ('\' Ajan Köyü — köy (localhost:8765) + Telegram dinleyici. Kaldırmak için bu dosyayı sil.\r\n'
+            f'CreateObject("WScript.Shell").Run "{komut}", 0, False\r\n')
+
+
+def baslangic_klasoru():
+    """Windows Başlangıç klasörünün WSL yolu (%APPDATA%\\Microsoft\\Windows\\Start Menu\\Programs\\Startup)."""
+    appdata = subprocess.run(["cmd.exe", "/c", "echo %APPDATA%"], capture_output=True, timeout=15,
+                             cwd="/mnt/c").stdout.decode("utf-8", errors="replace").strip()
+    yol = subprocess.run(["wslpath", "-u", appdata], capture_output=True, text=True, check=True).stdout.strip()
+    return Path(yol) / "Microsoft" / "Windows" / "Start Menu" / "Programs" / "Startup"
+
+
 def tam_ad(gorev):
     return f"{KLASOR}{gorev['ad']}"
 
@@ -129,26 +150,60 @@ def kur():
     (KOK / "sirket-log").mkdir(exist_ok=True)
     kullanici = windows_kullanicisi()
     sonuclar = []
-    for gorev in GOREVLER:
+    for gorev in TAKVIM:
         with tempfile.NamedTemporaryFile("wb", suffix=".xml", delete=False, dir=KOK / "sirket-log") as dosya:
             dosya.write(gorev_xml(gorev, kullanici=kullanici).encode("utf-16"))
             yol = Path(dosya.name)
         kod, cikti = _schtasks("/Create", "/F", "/TN", tam_ad(gorev), "/XML", _windows_yolu(yol))
         yol.unlink(missing_ok=True)
         sonuclar.append((gorev["ad"], "kuruldu" if kod == 0 else f"kurulamadı: {cikti}"))
+    try:
+        hedef = baslangic_klasoru() / BASLANGIC_DOSYASI
+        hedef.write_bytes(servis_vbs().encode("utf-16"))
+        sonuclar.append(("servis", f"kuruldu (Başlangıç klasörü: {hedef.name})"))
+    except (OSError, subprocess.SubprocessError) as exc:
+        sonuclar.append(("servis", f"kurulamadı: {type(exc).__name__}: {exc}"))
+    _schtasks("/Delete", "/F", "/TN", f"{KLASOR}servis")   # eski sürümün kalıntısı varsa
     return sonuclar
 
 
 def kaldir():
-    return [(g["ad"], "silindi" if _schtasks("/Delete", "/F", "/TN", tam_ad(g))[0] == 0 else "zaten yoktu")
-            for g in GOREVLER]
+    sonuclar = [(g["ad"], "silindi" if _schtasks("/Delete", "/F", "/TN", tam_ad(g))[0] == 0 else "zaten yoktu")
+                for g in TAKVIM]
+    try:
+        hedef = baslangic_klasoru() / BASLANGIC_DOSYASI
+        vardi = hedef.exists()
+        hedef.unlink(missing_ok=True)
+        sonuclar.append(("servis", "silindi" if vardi else "zaten yoktu"))
+    except (OSError, subprocess.SubprocessError):
+        sonuclar.append(("servis", "Başlangıç klasörüne ulaşılamadı"))
+    return sonuclar
+
+
+def servisi_simdi_baslat():
+    """Servisi Başlangıç'taki betikle başlatır (wscript.exe → gizli wsl.exe). Böylece bu terminal
+    kapansa da WSL açık kalır. Betik yoksa doğrudan arka planda başlatır."""
+    try:
+        vbs = baslangic_klasoru() / BASLANGIC_DOSYASI
+        if vbs.exists():
+            subprocess.Popen(["wscript.exe", _windows_yolu(vbs)], cwd="/mnt/c",
+                             stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+            return "servis başladı → http://localhost:8765 (log: sirket-log/koy.log, sirket-log/telegram-dinle.log)"
+    except (OSError, subprocess.SubprocessError):
+        pass
+    subprocess.Popen(["bash", str(KOK / "bin" / "wsl-tetik.sh"), "servis"], cwd=str(KOK),
+                     stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, start_new_session=True)
+    return ("servis bu terminalden başladı → http://localhost:8765 — terminali kapatırsan durabilir; "
+            "kalıcı olması için önce --kur")
 
 
 def main(argv):
     if "--kuru" in argv:
-        for gorev in GOREVLER:
-            print(f"--- {tam_ad(gorev)} · {gorev.get('saat', 'oturum açılınca')} · {gorev['ne']}")
+        for gorev in TAKVIM:
+            print(f"--- {tam_ad(gorev)} · {gorev['saat']} · {gorev['ne']}")
             print(f"    conhost.exe {komut_argumanlari(gorev)}")
+        print(f"--- Başlangıç klasörü/{BASLANGIC_DOSYASI} · oturum açılınca · köy + Telegram dinleyici")
+        print("    " + servis_vbs().splitlines()[1])
         print("\n--- örnek XML (saatlik) ---")
         print(gorev_xml(GOREVLER[1]))
         print("(kuru koşu: hiçbir görev yazılmadı)")
@@ -167,9 +222,14 @@ def main(argv):
             print(f"{ad:<8} {mesaj}")
         return 0
     if "--durum" in argv:
-        for gorev in GOREVLER:
+        for gorev in TAKVIM:
             kod, cikti = _schtasks("/Query", "/TN", tam_ad(gorev), "/FO", "LIST")
             print(f"--- {tam_ad(gorev)}\n{cikti if kod == 0 else 'kurulu değil'}")
+        try:
+            var = (baslangic_klasoru() / BASLANGIC_DOSYASI).exists()
+        except (OSError, subprocess.SubprocessError):
+            var = False
+        print(f"--- servis (Başlangıç klasörü)\n{'kurulu' if var else 'kurulu değil'}")
         return 0
     if "--simdi" in argv:
         ad = argv[argv.index("--simdi") + 1] if len(argv) > argv.index("--simdi") + 1 else ""
@@ -177,6 +237,9 @@ def main(argv):
         if not gorev:
             print("hangi görev? sabah | saatlik | aksam | servis", file=sys.stderr)
             return 2
+        if gorev["ad"] == "servis":
+            print(servisi_simdi_baslat())
+            return 0
         kod, cikti = _schtasks("/Run", "/TN", tam_ad(gorev))
         print(cikti)
         return 0 if kod == 0 else 1

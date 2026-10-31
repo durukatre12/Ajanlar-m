@@ -89,6 +89,8 @@ class AyarTesti(unittest.TestCase):
 class KuruKosuTesti(unittest.TestCase):
     def test_kos_kuru_calisir_ve_hicbir_dosyaya_yazmaz(self):
         for ad in ("ilan-avcisi", "fikir-atolyesi", "basvuru-takip"):
+            kosu_dizini = KOK / "takimlar" / ad / "kosu"
+            kosular_oncesi = sorted(kosu_dizini.glob("*.md"))   # gerçek koşular olabilir; yeni dosya açılmamalı
             oncesi = json.loads((KOK / "takimlar" / ad / "durum.json").read_text(encoding="utf-8"))
             yakala = io.StringIO()
             with redirect_stdout(yakala):
@@ -98,7 +100,7 @@ class KuruKosuTesti(unittest.TestCase):
             self.assertIn("claude çağrılmadı", yakala.getvalue())
             sonrasi = json.loads((KOK / "takimlar" / ad / "durum.json").read_text(encoding="utf-8"))
             self.assertEqual(oncesi, sonrasi, f"{ad}: kuru koşu durum.json'u değiştirdi")
-            self.assertEqual(list((KOK / "takimlar" / ad / "kosu").glob("*.md")), [])
+            self.assertEqual(sorted(kosu_dizini.glob("*.md")), kosular_oncesi)
 
     def test_istem_anayasayi_ve_kosu_kaydini_soyler(self):
         fm = ayar.takim_bilgisi("ilan-avcisi")
@@ -359,7 +361,8 @@ class BelgeTutarliligiTesti(unittest.TestCase):
                      r"\bgh[pousr]_[A-Za-z0-9]{30,}", r"\b\d{9,}:[A-Za-z0-9_-]{30,}")]
         atla = {".git", "__pycache__", "kosu", "cikti", "gelen", "veri"}
         for yol in KOK.rglob("*"):
-            if not yol.is_file() or yol.name == "test_kit.py" or set(yol.parts) & atla:
+            # .env git'e girmez (.gitignore'un ilk satırı); anahtarın yeri orası, sızıntı değil
+            if not yol.is_file() or yol.name in ("test_kit.py", ".env") or set(yol.parts) & atla:
                 continue
             if yol.suffix not in (".py", ".md", ".json", ".sh", ".example", ".gitignore", ""):
                 continue

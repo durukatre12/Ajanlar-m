@@ -14,3 +14,4 @@ takimlar/*/veri/
 .DS_Store
 sirket/model-proxy/
 takimlar/*/.calisiyor
+*.save

@@ -9,6 +9,9 @@
 - Açık veri kaynağı önerilirken gerçekten var olduğu (bağlantısı açıldığı) gösterilir.
 - Önceki fikirler (`veri/fikirler.md`) ve profildeki mevcut projeler tekrar önerilmez.
 
+- Koşu kaydında `## Açılan bağlantılar` bölümü bulunur (bkz. `sirket/AJAN-KIMLIGI.md` adım 5); çıktıdaki her
+  kaynak/ilan bağlantısı orada `açıldı` olarak geçer. Açılmayan bağlantı çıktıya kaynak olarak girmez.
+
 ## Asla yapmaz
 - Yatırım tavsiyesi, hukuki görüş vermez; "şu kadar kazanırsın" demez.
 - Bir şirketi ya da kişiyi kaynaksız eleştirmez.

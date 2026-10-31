@@ -46,6 +46,9 @@ Kuyruğa `not-` ile başlayan bir madde düştüyse o maddeyi o bıraktı.
 4. **Çıktı:** `takimlar/<takim>/cikti/` altına tarihli dosya. Çıktının **ilk satırından sonraki ilk paragraf**
    patronun Telegram'da göreceği özettir; kısa ve işe yarar yaz.
 5. **Kayıt:** `SIRKET_KOSU` ortam değişkenindeki yola koşu kaydı. Ne okudun, ne ürettin, ne kaldı.
+   Web'e çıktıysan kayda **`## Açılan bağlantılar`** bölümü koy: çıktıda kaynak olarak geçen her bağlantı için
+   tek satır `- <adres> · <açıldı / açılmadı (sebep)> · <sayfada ne buldun — tek cümle>`. Bekçi bağlantıları
+   kendisi açamaz; kanıt bu bölümdür. Çıktıda bu listede olmayan kaynak kullanma.
 6. **Denetim:** Bekçi kaydını okur. Kabul → çıktı patronun önüne gider. Red → sebep `durum.json`'a düşer.
 7. **Karar:** Gönderen sen değilsin, patron. Sen taslağa kadar gider durursun.
 

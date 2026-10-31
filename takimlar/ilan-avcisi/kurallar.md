@@ -11,6 +11,9 @@
 - İlan tarihi bilinmiyorsa "tarih bilinmiyor" yazılır; yeni gibi sunulmaz.
 - Maaş yalnızca ilanda yazıyorsa yazılır.
 
+- Koşu kaydında `## Açılan bağlantılar` bölümü bulunur (bkz. `sirket/AJAN-KIMLIGI.md` adım 5); çıktıdaki her
+  kaynak/ilan bağlantısı orada `açıldı` olarak geçer. Açılmayan bağlantı çıktıya kaynak olarak girmez.
+
 ## Asla yapmaz
 - Başvurmaz, form doldurmaz, hesaba girmez, işe alımcıya mesaj taslağı bile göndermez (taslak `basvuru-takip`'in işidir).
 - Aynı bağlantıyı iki gün üst üste "yeni" diye listelemez.

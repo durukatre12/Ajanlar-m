@@ -69,9 +69,9 @@ def _oku(yol, varsayilan=""):
         return varsayilan
 
 
-def _istem(anayasa, kurallar, kosu_metni):
+def _istem(anayasa, kurallar, kosu_metni, ciktilar=""):
     return (
-        "Sen bir içerik şirketinin bağımsız denetçisisin. Üretici başka bir modeldir; onun koşu "
+        "Sen bir kişisel ajan köyünün bağımsız denetçisisin. Üretici başka bir modeldir; onun koşu "
         "kaydını aşağıdaki ANAYASA ve takım kurallarına göre denetle. Kanıt olmadan 'kabul' verme; "
         "şüphede 'red'. Yalnızca JSON döndür.\n"
         "Not: ANAYASA madde 3 (bekçi ayrı kafa) ve madde 4 (tavanlar) senin ve sürücünün kuralıdır; "
@@ -80,9 +80,37 @@ def _istem(anayasa, kurallar, kosu_metni):
         "'Kaynaksız sayı' yalnızca DIŞ DÜNYA iddiaları içindir (görüntülenme, abone, fiyat, gelir, "
         "tarih). Koşu altbilgisi (maliyet/tur/hata), kelime ve dosya sayıları, saatler ve kaydın kendi "
         "ölçümleri kaynak istemez. Kural dosyasındaki hedef aralıklardan %15'e kadar sapma RED sebebi "
-        "değildir; gerekçeye 🟡 not düş, kararı 'kabul' ver.\n\n"
+        "değildir; gerekçeye 🟡 not düş, kararı 'kabul' ver.\n"
+        "Bu koşunun ürettiği çıktı dosyaları <ciktilar> içinde verilir; çıktıyı oradan denetle. "
+        "Bağlantıların açıldığının kanıtı, koşu kaydındaki '## Açılan bağlantılar' bölümüdür "
+        "(adres · sonuç · ne bulundu). Sen bağlantıları kendin açamazsın: bu bölüm varsa ve çıktıdaki "
+        "kaynaklarla tutarlıysa kanıt yeterlidir; 'sayfa yanıtının tamamı kayda eklenmemiş' RED sebebi "
+        "değildir. Çıktıda o bölümde hiç geçmeyen bir kaynak ya da kaynaksız bir dış dünya sayısı "
+        "varsa RED ver.\n\n"
         f"<anayasa>\n{anayasa}\n</anayasa>\n\n<kurallar>\n{kurallar}\n</kurallar>\n\n"
-        f"<kosu>\n{kosu_metni[:24000]}\n</kosu>")
+        f"<kosu>\n{kosu_metni[:24000]}\n</kosu>\n\n<ciktilar>\n{ciktilar or '(bu koşuda çıktı dosyası yok)'}\n</ciktilar>")
+
+
+def kosu_ciktilari(kok, takim, kosu, sinir=16000):
+    """Koşu başladıktan sonra yazılmış `cikti/*.md` dosyaları — bekçi çıktıyı da görsün.
+    Başlangıç zamanı koşu dosyasının adından (YYYY-MM-DD-HHMM) okunur; okunamazsa son 1 saat."""
+    import time
+    from datetime import datetime
+    dizin = Path(kok) / "takimlar" / takim / "cikti"
+    if not dizin.is_dir():
+        return ""
+    try:
+        baslangic = datetime.strptime(Path(kosu).stem, "%Y-%m-%d-%H%M").timestamp() - 60
+    except ValueError:
+        baslangic = time.time() - 3600
+    parcalar, kalan = [], sinir
+    for yol in sorted(dizin.glob("*.md"), key=lambda p: p.stat().st_mtime, reverse=True):
+        if yol.stat().st_mtime < baslangic or kalan <= 0:
+            continue
+        metin = _oku(yol)[:kalan]
+        kalan -= len(metin)
+        parcalar.append(f"### cikti/{yol.name}\n{metin}")
+    return "\n\n".join(parcalar)
 
 
 def yaniti_ayristir(yanit):
@@ -200,7 +228,8 @@ def denetle(kok, takim, kosu):
                  "ihlal_edilen_kural": "gizli veri"}
     else:
         istem = _istem(_oku(kok / "ANAYASA.md"),
-                       _oku(kok / "takimlar" / takim / "kurallar.md", "(kural dosyası yok)"), metin)
+                       _oku(kok / "takimlar" / takim / "kurallar.md", "(kural dosyası yok)"), metin,
+                       kosu_ciktilari(kok, takim, kosu))
         karar = gecersiz_gerekceyi_ayikla(llm_karari(os.environ.get("OPENAI_API_KEY"), istem))
     _kaydet(kok, takim, kosu, karar)
     return karar

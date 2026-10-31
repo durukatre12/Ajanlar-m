@@ -87,6 +87,31 @@ class KoyTesti(unittest.TestCase):
         self.assertIn("Ajan Köyü", (KOK / "koy/index.html").read_text(encoding="utf-8"))
 
 
+class BekciCiktiTesti(unittest.TestCase):
+    def test_bekci_kosudan_sonra_yazilan_ciktiyi_gorur(self):
+        import bekci
+        with tempfile.TemporaryDirectory() as d:
+            kok = Path(d)
+            (kok / "takimlar/fikir-atolyesi/cikti").mkdir(parents=True)
+            (kok / "takimlar/fikir-atolyesi/kosu").mkdir(parents=True)
+            from datetime import datetime, timedelta
+            kosu = kok / "takimlar/fikir-atolyesi/kosu" / (datetime.now() - timedelta(minutes=5)).strftime("%Y-%m-%d-%H%M.md")
+            kosu.write_text("kayıt", encoding="utf-8")
+            eski = kok / "takimlar/fikir-atolyesi/cikti/eski.md"
+            eski.write_text("ESKI", encoding="utf-8")
+            os.utime(eski, (time.time() - 86400, time.time() - 86400))
+            (kok / "takimlar/fikir-atolyesi/cikti/yeni.md").write_text("YENI çıktı", encoding="utf-8")
+            metin = bekci.kosu_ciktilari(kok, "fikir-atolyesi", kosu)
+        self.assertIn("YENI çıktı", metin)
+        self.assertNotIn("ESKI", metin)
+
+    def test_bekci_istemi_cikti_ve_baglanti_kuralini_tasir(self):
+        import bekci
+        istem = bekci._istem("A", "K", "kayıt", "### cikti/x.md\nmetin")
+        self.assertIn("<ciktilar>", istem)
+        self.assertIn("## Açılan bağlantılar", istem)
+
+
 class WindowsZamanlayiciTesti(unittest.TestCase):
     def test_saatlik_gorev_tekrarlar_ve_kacani_telafi_eder(self):
         saatlik = next(g for g in zw.GOREVLER if g["ad"] == "saatlik")
@@ -107,6 +132,12 @@ class WindowsZamanlayiciTesti(unittest.TestCase):
         xml = zw.gorev_xml(servis, kullanici="desktop-x\\dell")
         self.assertIn("<LogonTrigger><Enabled>true</Enabled><UserId>desktop-x\\dell</UserId></LogonTrigger>", xml)
         self.assertIn('<Principal id="Author"><UserId>desktop-x\\dell</UserId>', xml)
+
+    def test_servis_baslangic_betigi_gizli_calisir(self):
+        vbs = zw.servis_vbs()
+        self.assertIn("wsl-tetik.sh servis", vbs)
+        self.assertTrue(vbs.rstrip().endswith(", 0, False"), "pencere açmamalı (0) ve beklememeli")
+        self.assertNotIn("servis", [g["ad"] for g in zw.TAKVIM], "servis Görev Zamanlayıcı'ya yazılmaz")
 
     def test_tetik_betigi_var_ve_dort_komutu_bilir(self):
         betik = (KOK / "bin/wsl-tetik.sh").read_text(encoding="utf-8")
