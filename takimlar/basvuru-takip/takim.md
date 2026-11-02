@@ -16,6 +16,8 @@ butce_usd: 2
   "X şirketinden red geldi".
 - **Haftalık, pazartesi** (`bv-<YYYY-Www>`): haftalık başvuru özeti + takip e-postası taslakları.
 - **Zincirden** (`hz-<id>`): `ilan-avcisi` puanı 8+ bir ilan buldu → o ilan için ön yazı taslağı.
+- **Telegram'dan tanıştırma** (`bv-<update_id>`): "tanıştır <e-posta> <ilan no> [ad]" — ortak bir tanıdıktan,
+  o ilandaki şirkette çalışan biriyle tanıştırılma ricası.
 - **Elle / köyden** (`el-<zaman>`): haftalık özetle aynı.
 
 ## Akan şey
@@ -37,7 +39,11 @@ Girdi: kuyruk notu (patronun mesajı), `takimlar/basvuru-takip/veri/basvurular.m
    21+ gündür cevapsız olanı `sessiz` durumuna çek ve özette belirt.
 4. **`hz-<id>` (ön yazı):** kuyruk notundaki ilan numarasını `ilan-avcisi`'nin ilgili çıktısından bul, bağlantıyı aç,
    `skills/basvuru-yazismasi` → **ön yazı taslağı** + "CV'de öne çıkar" 3 madde. Başvuru tablosuna **ekleme** —
-   patron başvurmadan başvuru yoktur.
+   patron başvurmadan başvuru yoktur. İlan metninde başvuru için bir **e-posta adresi** yazıyorsa ayrıca
+   `cikti/eposta/` altına ön yazılı başvuru maili dosyası bırak (aşağıdaki biçim, `ek: cv`). Adres yoksa dosya yok.
+4b. **Tanıştırma** ("tanıştır …" notu): numarayı `ilan-avcisi`'nin en yeni listesinde bul (yoksa sor, dosya yazma);
+   `skills/basvuru-yazismasi` → **tanıştırma ricası** ile `cikti/eposta/` altına dosya bırak (`tur: tanistirma`, `ek: yok`).
+   Alıcının adı notta yoksa "Merhaba," — isim uydurma.
 5. Kuyruk maddesini `tamam` yap. `defter.md`'ye en fazla bir ders.
 6. Koşu kaydını `SIRKET_KOSU` yoluna yaz: hangi satırlar değişti, kaç taslak üretildi, çıktı yolu.
 
@@ -54,12 +60,26 @@ Durum yalnızca şunlardan biri: `başvuruldu` · `mülakat` · `teklif` · `red
 - Adım 2–4 → `skills/basvuru-yazismasi/SKILL.md` — takip e-postası, ön yazı, mülakat kartı şablonları
 - Adım 4 → `skills/ilan-eslestirme/SKILL.md` — ilanı profille karşılaştırma
 
+## E-posta dosyası (`cikti/eposta/YYYY-MM-DD-<şirket>-<tür>.md`)
+```
+---
+kime: <alıcı e-postası — ilandan ya da patronun notundan, uydurma yok>
+konu: <konu satırı>
+tur: on-yazi | tanistirma
+ek: cv | yok
+---
+<yalnız gövde: selam, metin, imza — Markdown yok, düz metin>
+```
+Dosyayı Gmail'e sen koymazsın: koşu bitince `bin/posta.py` taslağa çevirir, patron Telegram'dan onaylar.
+Aynı şirket + tür için ikinci dosya yazma. Çıktı `.md`'de taslağı `## Taslaklar` altında da göster.
+
 ## Çıktı sözleşmesi
 `cikti/YYYY-MM-DD-<id>.md`: `# <Başlık>`, ardından **tek paragraf özet** (Telegram'a bu gider), sonra
 `## Tablo` (açık başvurular), varsa `## Taslaklar` (her taslak `### <Şirket> — <tür>` başlığıyla, konu satırı dahil),
 varsa `## Mülakat hazırlığı`.
 
 ## Asla
-- E-posta göndermez, başvuru yapmaz, işe alımcıya yazmaz — taslak yazar (ANAYASA §1).
+- E-posta göndermez, Gmail'e dokunmaz, başvuru yapmaz — e-postayı dosya olarak yazar; göndermek patronun
+  `gönder <no>` komutuyla sürücünündür (ANAYASA §1 e-posta istisnası).
 - Patron "başvurdum" demeden tabloya başvuru eklemez; ilan listesi başvuru değildir.
 - Taslağa telefon/adres yazmaz; `[telefon]` yer tutucusu kullanır. İşe alımcının adını bilmiyorsa uydurmaz.

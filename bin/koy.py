@@ -41,7 +41,9 @@ def plan_metni(takim):
     for madde in gunluk.HAFTALIK:
         if madde["takim"] == takim:
             gunler = madde["gunler"]
-            if gunler == [0, 1, 2, 3, 4]:
+            if gunler == [0, 1, 2, 3, 4, 5, 6]:
+                metin = "Her gün"
+            elif gunler == [0, 1, 2, 3, 4]:
                 metin = "Hafta içi"
             else:
                 metin = ", ".join(GUNLER[g] for g in gunler)

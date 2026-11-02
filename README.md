@@ -13,7 +13,7 @@ Takımlar, yetenekler, köy arayüzü, Telegram özetleri ve Windows (WSL) zaman
 
 | Bina | Takım | Ne zaman | Ne çıkar |
 |---|---|---|---|
-| 🔭 Gözetleme kulesi | `ilan-avcisi` | hafta içi 09:00 · Telegram'dan "ilan bak" ya da ilan linki | `cikti/<tarih>-ilanlar.md` — numaralı, puanlı, bağlantılı yeni ilanlar |
+| 🔭 Gözetleme kulesi | `ilan-avcisi` | her gün 09:00 · Telegram'dan "ilan bak", ilan linki ya da "temas <no>" | `cikti/<tarih>-ilanlar.md` — numaralı, puanlı, bağlantılı yeni ilanlar + öne çıkanlara sıcak temas aramaları |
 | 📮 Postane | `basvuru-takip` | Telegram'dan "başvurdum 3", "mülakat geldi" · pazartesi · zincirden | başvuru tablosu, takip e-postası / ön yazı / mülakat kartı **taslakları** |
 | 💡 Fikir atölyesi | `fikir-atolyesi` | cumartesi · Telegram'dan "fikir: tarım" | `cikti/<tarih>-fikirler.md` — 3–4 kaynaklı fikir + haftanın favorisi |
 | ⚡ Şarj istasyonu | `voltyol-bekci` | pazar · Telegram'dan "voltyol site nasıl" | `cikti/<tarih>-voltyol.md` — site ölçümü, haftalık commit'ler, sıradaki adım |
@@ -24,7 +24,7 @@ Her takım `takimlar/<takim>/` altında aynı dört dosyayla yaşar: `takim.md` 
 ## Döngü
 
 ```
- sen (Telegram)  "başvurdum 3"                  Görev Zamanlayıcı 09:00 (hafta içi il-<tarih> ...)
+ sen (Telegram)  "başvurdum 3"                  Görev Zamanlayıcı 09:00 (her gün il-<tarih> ...)
         │                                                   │
  bin/telegram_dinle.py ── takım seç ──► kuyruk ◄── bin/gunluk.py --sabah
         │                                  │
@@ -57,6 +57,9 @@ Windows için komut komut ayrıntılı hâli: **[KURULUM.md](KURULUM.md)**. Wind
 | `TELEGRAM_BOT_TOKEN` | Bot gelen kutusu ve özetler (@BotFather) | dinleyici açılmaz, özet gitmez; takımlar yine saatinde koşar, çıktı köyde görünür |
 | `TELEGRAM_CHAT_ID` | Yalnızca senin mesajların işlensin, özet yalnız sana gitsin | aynı |
 | `OPENAI_API_KEY` | Bekçi — ayrı model ailesi (ANAYASA §3) | **yoksa ya da geçersizse** yedek yol `claude -p --model haiku`; karar "bekçi aynı aileden — uyarı" notuyla kaydedilir |
+| `GMAIL_CLIENT_ID` · `GMAIL_CLIENT_SECRET` | Google Cloud OAuth istemcisi (KURULUM.md · Gmail) | e-posta dosyaları Gmail'e konmaz; Telegram'a "Gmail bağlı değil" gelir, taslak `cikti/eposta/`'da kalır |
+| `GMAIL_REFRESH_TOKEN` | `python3 bin/gmail_yetki.py` bir kez | aynı |
+| `GMAIL_CV_YOLU` | CV PDF'inin yolu | `ek: cv` olan mail Gmail'e konmaz |
 | `NVIDIA_API_KEY` | Ajanı Anthropic yerine NVIDIA'nın bedava modeliyle koşturmak ([docs/07](docs/07-farkli-model.md)) | hiçbir şey değişmez |
 | `NIM_MODEL` | Koşacak NIM modeli (tool-use desteklemeli) | `saglayici: nim` koşusu atlanır |
 

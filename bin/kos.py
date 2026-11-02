@@ -251,6 +251,12 @@ def kos(takim, kuru=False, zorla=False):
     finally:
         isaret.unlink(missing_ok=True)
     haber.gonder(haber.kosu_haberi(takim, sonuc, baslangic))
+    if takim == "basvuru-takip":   # e-posta dosyaları → Gmail taslağı + Telegram onayı (bin/posta.py)
+        try:
+            import posta
+            posta.yukle(haber=haber.gonder)
+        except Exception as exc:  # noqa: BLE001 — posta yolu koşuyu bağlamaz
+            print(f"posta yüklenemedi: {type(exc).__name__}", file=sys.stderr)
     print(f"{takim}: {sonuc} · {cozum['maliyet']:.3f} USD · {kosu.relative_to(KOK)}")
     return 0
 

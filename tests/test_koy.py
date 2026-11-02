@@ -68,7 +68,7 @@ class KoyTesti(unittest.TestCase):
         json.dumps(veri, ensure_ascii=False)   # JSON'a çevrilebilir olmalı
 
     def test_plan_metni_gunluk_planla_ayni(self):
-        self.assertTrue(koy.plan_metni("ilan-avcisi").startswith("Hafta içi"))
+        self.assertTrue(koy.plan_metni("ilan-avcisi").startswith("Her gün"))
         self.assertTrue(koy.plan_metni("fikir-atolyesi").startswith("Cmt"))
 
     def test_bilinmeyen_takim_calistirilmaz(self):

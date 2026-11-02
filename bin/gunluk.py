@@ -30,7 +30,7 @@ GUNLER = ["Pazartesi", "Salı", "Çarşamba", "Perşembe", "Cuma", "Cumartesi", 
 # Planlı iş — sabah tetiği bu maddeleri kuyruğa düşürmezse dağıtıcı o takımları hiç başlatmaz.
 # `gunler`: haftanın günleri (0 = pazartesi). `id` içinde {tarih} (YYYY-MM-DD) ya da {hafta} (YYYY-Www).
 HAFTALIK = [
-    {"takim": "ilan-avcisi", "gunler": [0, 1, 2, 3, 4], "id": "il-{tarih}",
+    {"takim": "ilan-avcisi", "gunler": [0, 1, 2, 3, 4, 5, 6], "id": "il-{tarih}",
      "not": "günlük ilan taraması — yalnız yeni ilanlar"},
     {"takim": "basvuru-takip", "gunler": [0], "id": "bv-{hafta}",
      "not": "haftalık başvuru özeti + 7+ gün cevapsızlara takip e-postası taslağı"},

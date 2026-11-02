@@ -11,6 +11,11 @@ Her iş taslağa kadar gider ve orada durur; başvurmak, göndermek, yayınlamak
 Çıktı `takimlar/<takim>/cikti/` altına yazılır; oradan sonrasını insan taşır.
 Patrona giden tek kanal Telegram özetidir ve onu ajan değil sürücü (`bin/kos.py`) gönderir.
 
+**E-posta istisnası (patron kararı, 2026-11-03).** `basvuru-takip` e-postayı yalnızca **dosya** olarak yazar
+(`cikti/eposta/`). Sürücü `bin/posta.py` dosyayı Gmail'e **taslak** olarak koyar ve patrona Telegram'dan sorar.
+E-posta yalnızca patron Telegram'dan `gönder <no>` yazdığında gider; ajan Gmail'e erişemez, gönderemez.
+Doldurulmamış yer tutucusu (`[ad]` gibi) olan taslak gönderilmez.
+
 ## 2 · Kaynaksız iddia yok
 
 Her ilan bir bağlantıyla, her pazar sayısı bir kaynakla yazılır. Bağlantısı olmayan ilan listeye girmez.

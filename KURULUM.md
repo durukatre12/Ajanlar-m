@@ -49,13 +49,15 @@ head -1 .gitignore     # ".env" — anahtar dosyası hiçbir zaman commit'e girm
 nano .env              # ya da: code .   (VS Code + "WSL" eklentisi)
 ```
 
-5 anahtar var, hiçbiri zorunlu değil:
+9 anahtar var, hiçbiri zorunlu değil:
 
 | Anahtar | Nereden alınır | Boşsa |
 |---|---|---|
 | `TELEGRAM_BOT_TOKEN` | Telegram'da @BotFather → `/newbot` | Telegram'dan iş veremezsin, özet gelmez; plan yine saatinde koşar |
 | `TELEGRAM_CHAT_ID` | aşağıdaki `--chat-id-bul` | aynı |
 | `OPENAI_API_KEY` | platform.openai.com | **yoksa ya da geçersizse** bekçi Haiku'ya düşer, kararına "bekçi aynı aileden — uyarı" notu eklenir |
+| `GMAIL_CLIENT_ID` · `GMAIL_CLIENT_SECRET` · `GMAIL_REFRESH_TOKEN` | aşağıdaki **Gmail** | e-posta dosyaları Gmail'e konmaz |
+| `GMAIL_CV_YOLU` | CV PDF'inin WSL yolu | `ek: cv` olan başvuru maili Gmail'e konmaz |
 | `NVIDIA_API_KEY` | build.nvidia.com → model kartı → Get API Key | hiçbir şey değişmez ([docs/07](docs/07-farkli-model.md)) |
 | `NIM_MODEL` | tool-use destekleyen bir NIM modeli | `saglayici: nim` koşusu atlanır |
 
@@ -69,6 +71,20 @@ python3 bin/haber.py "Ajan Köyü kuruldu"     # telefonuna bu mesaj gelmeli
 
 Çıkan sayıyı `TELEGRAM_CHAT_ID`'ye yaz. Bu filtre olmadan bota yazan herkesin mesajı işlenirdi;
 bu yüzden yalnız o chat id'den gelen mesajlar okunur ve özetler yalnız oraya gider.
+
+**Gmail (10 dk, bir kez).** Postacı mailleri Gmail taslağı yapar; sen Telegram'dan `gönder 3` yazınca gider.
+1. console.cloud.google.com → yeni proje → *APIs & Services › Library* → **Gmail API** → Enable.
+2. *OAuth consent screen* → External → uygulama adı "Ajan Köyü" → *Test users*'a kendi Gmail adresini ekle.
+   Sonra **Publish app** ile durumu *In production*'a al: *Testing*'de kalırsa Google izni **7 günde** düşürür
+   ve gönderim durur. Doğrulama başvurusu gerekmez; giriş ekranında "doğrulanmadı" uyarısı çıkar, o kadar.
+3. *Credentials › Create credentials › OAuth client ID* → **Desktop app** → çıkan Client ID ve Secret'ı
+   `.env`'de `GMAIL_CLIENT_ID` ve `GMAIL_CLIENT_SECRET`'a yaz. `GMAIL_CV_YOLU`'na CV PDF'inin yolunu yaz.
+4. `python3 bin/gmail_yetki.py` → tarayıcıda hesabını seç, izin ver ("Google doğrulamadı" uyarısında
+   *Gelişmiş › devam et* — uygulama senin). Ekrana basılan `GMAIL_REFRESH_TOKEN=...` satırını `.env`'e ekle.
+5. Dene: `python3 bin/posta.py taslaklar` → "Bekleyen e-posta taslağı yok."
+
+Kapsam `gmail.compose`: taslak açar ve gönderir, gelen kutunu **okuyamaz**. Telegram komutları:
+`tanıştır ad@ornek.com 2` · `gönder 4` · `iptal 4` · `taslaklar`.
 
 > **`.env` her zaman kabuğu ezer.** Kabuğunda aynı adla eski bir değer duruyorsa bile koşu
 > `.env`'deki değeri kullanır (`bin/ayar.py` → `ortam_yukle`).
@@ -161,7 +177,7 @@ python3 bin/zamanla_windows.py --durum
 
 | Görev | Ne zaman | Ne yapar |
 |---|---|---|
-| `\AjanKoyu\sabah` | her gün 09:00 | günün planını kuyruğa düşürür (hafta içi ilan, pzt başvuru, cmt fikir, paz Voltyol) + dağıtıcı |
+| `\AjanKoyu\sabah` | her gün 09:00 | günün planını kuyruğa düşürür (her gün ilan, pzt başvuru, cmt fikir, paz Voltyol) + dağıtıcı |
 | `\AjanKoyu\saatlik` | 10:05–22:05 saatte bir | sırada bekleyen işleri alır |
 | `\AjanKoyu\aksam` | her gün 22:00 | günün denetim raporu (`sirket-log/rapor/`) |
 | `\AjanKoyu\servis` | Windows'a giriş yapınca | köy (localhost:8765) + Telegram dinleyici |
