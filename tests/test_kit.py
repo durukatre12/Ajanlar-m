@@ -413,6 +413,7 @@ class TelegramDinleTesti(unittest.TestCase):
     def test_takim_sec_ilan_kelimesi_ve_link_ilan_avcisina(self):
         self.assertEqual(telegram_dinle.takim_sec(_mesaj(3)), "ilan-avcisi")
         self.assertEqual(telegram_dinle.takim_sec(_mesaj(4, linkler=(), notu="İlan bak fintech")), "ilan-avcisi")
+        self.assertEqual(telegram_dinle.takim_sec(_mesaj(5, linkler=(), notu="temas 3")), "ilan-avcisi")
 
     def test_takim_sec_buyuk_kucuk_harf_ayirmaz(self):
         for yazim in ("Fikir", "FİKİR", "fikir"):
@@ -708,13 +709,13 @@ class GunlukRaporTesti(unittest.TestCase):
         self.assertEqual(tekrar, [], "aynı haftanın maddesi ikinci kez yazılmamalı")
         self.assertEqual([(o["id"], o["durum"]) for o in kuyruk], [("bv-2026-W38", "bekliyor")])
 
-    def test_ilan_taramasi_hafta_ici_her_gun_hafta_sonu_degil(self):
+    def test_ilan_taramasi_her_gun_hafta_sonu_dahil(self):
         with tempfile.TemporaryDirectory() as d:
             kok = sahte_kok(d, takimlar=("ilan-avcisi",))
             sali = gunluk.haftalik_kuyruk(kok, datetime(2026, 9, 15, 9, 0).astimezone())
             cumartesi = gunluk.haftalik_kuyruk(kok, datetime(2026, 9, 19, 9, 0).astimezone())
         self.assertEqual([h["id"] for h in sali], ["il-2026-09-15"])
-        self.assertEqual(cumartesi, [])
+        self.assertEqual([h["id"] for h in cumartesi], ["il-2026-09-19"])
 
     def test_hafta_sonu_fikir_ve_voltyol(self):
         with tempfile.TemporaryDirectory() as d:

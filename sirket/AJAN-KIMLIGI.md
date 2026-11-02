@@ -31,7 +31,7 @@ Kuyruğa `not-` ile başlayan bir madde düştüyse o maddeyi o bıraktı.
   - "voltyol / site" geçen mesaj → `voltyol-bekci` (`vb-<id>`)
   - "ilan" geçen ya da link taşıyan mesaj → `ilan-avcisi` (`il-<id>`)
 - **Günlük tetik** (`bin/gunluk.py`) — her sabah **09:00**'da günün planlı işlerini kuyruklara düşürür
-  (hafta içi `il-<tarih>`, pazartesi `bv-<hafta>`, cumartesi `fk-<hafta>`, pazar `vb-<hafta>`) ve dağıtıcıyı koşturur.
+  (her gün `il-<tarih>`, pazartesi `bv-<hafta>`, cumartesi `fk-<hafta>`, pazar `vb-<hafta>`) ve dağıtıcıyı koşturur.
   Mesai boyunca saatte bir dağıtıcı sıradaki işleri alır. Akşam **22:00**'de günü denetler.
 - **Köy** (`bin/koy.py`) — patronun tarayıcıda açtığı pikselli köy. Senin `durum.json`'unu ve `cikti/`'nı okur;
   çalışırken binanın önünde hareket edersin, yeni çıktın rozet olarak görünür.

@@ -13,7 +13,7 @@ Takımlar, yetenekler, köy arayüzü, Telegram özetleri ve Windows (WSL) zaman
 
 | Bina | Takım | Ne zaman | Ne çıkar |
 |---|---|---|---|
-| 🔭 Gözetleme kulesi | `ilan-avcisi` | hafta içi 09:00 · Telegram'dan "ilan bak" ya da ilan linki | `cikti/<tarih>-ilanlar.md` — numaralı, puanlı, bağlantılı yeni ilanlar |
+| 🔭 Gözetleme kulesi | `ilan-avcisi` | her gün 09:00 · Telegram'dan "ilan bak", ilan linki ya da "temas <no>" | `cikti/<tarih>-ilanlar.md` — numaralı, puanlı, bağlantılı yeni ilanlar + öne çıkanlara sıcak temas aramaları |
 | 📮 Postane | `basvuru-takip` | Telegram'dan "başvurdum 3", "mülakat geldi" · pazartesi · zincirden | başvuru tablosu, takip e-postası / ön yazı / mülakat kartı **taslakları** |
 | 💡 Fikir atölyesi | `fikir-atolyesi` | cumartesi · Telegram'dan "fikir: tarım" | `cikti/<tarih>-fikirler.md` — 3–4 kaynaklı fikir + haftanın favorisi |
 | ⚡ Şarj istasyonu | `voltyol-bekci` | pazar · Telegram'dan "voltyol site nasıl" | `cikti/<tarih>-voltyol.md` — site ölçümü, haftalık commit'ler, sıradaki adım |
@@ -24,7 +24,7 @@ Her takım `takimlar/<takim>/` altında aynı dört dosyayla yaşar: `takim.md` 
 ## Döngü
 
 ```
- sen (Telegram)  "başvurdum 3"                  Görev Zamanlayıcı 09:00 (hafta içi il-<tarih> ...)
+ sen (Telegram)  "başvurdum 3"                  Görev Zamanlayıcı 09:00 (her gün il-<tarih> ...)
         │                                                   │
  bin/telegram_dinle.py ── takım seç ──► kuyruk ◄── bin/gunluk.py --sabah
         │                                  │

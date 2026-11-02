@@ -161,7 +161,7 @@ python3 bin/zamanla_windows.py --durum
 
 | Görev | Ne zaman | Ne yapar |
 |---|---|---|
-| `\AjanKoyu\sabah` | her gün 09:00 | günün planını kuyruğa düşürür (hafta içi ilan, pzt başvuru, cmt fikir, paz Voltyol) + dağıtıcı |
+| `\AjanKoyu\sabah` | her gün 09:00 | günün planını kuyruğa düşürür (her gün ilan, pzt başvuru, cmt fikir, paz Voltyol) + dağıtıcı |
 | `\AjanKoyu\saatlik` | 10:05–22:05 saatte bir | sırada bekleyen işleri alır |
 | `\AjanKoyu\aksam` | her gün 22:00 | günün denetim raporu (`sirket-log/rapor/`) |
 | `\AjanKoyu\servis` | Windows'a giriş yapınca | köy (localhost:8765) + Telegram dinleyici |

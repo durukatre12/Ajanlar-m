@@ -16,6 +16,8 @@
 
 ## Asla yapmaz
 - Başvurmaz, form doldurmaz, hesaba girmez, işe alımcıya mesaj taslağı bile göndermez (taslak `basvuru-takip`'in işidir).
+  İstisna (patron kararı, 2026-11-03): `skills/sicak-temas` ile benzer rolde çalışana yönelik ≤200 karakterlik
+  bağlantı notu **taslağı** ve LinkedIn kişi **araması bağlantıları** üretilebilir. Kişi adı toplanmaz, yazılmaz.
 - Aynı bağlantıyı iki gün üst üste "yeni" diye listelemez.
 - Şirket hakkında kaynaksız yorum yazmaz ("çalışanlar memnun" gibi).
 

@@ -16,7 +16,7 @@ Yönlendirme `takim_sec`'te, tek yerde (`YONLENDIRME` tablosu, sırayla ilk eşl
   "başvurdum / mülakat / teklif / red / cevap geldi" → `basvuru-takip` (`bv-<id>`)
   "fikir"                                           → `fikir-atolyesi` (`fk-<id>`)
   "voltyol / ev-rota / site"                        → `voltyol-bekci` (`vb-<id>`)
-  "ilan" ya da link taşıyan geri kalan mesaj          → `ilan-avcisi` (`il-<id>`)
+  "ilan" / "temas <no>" ya da link taşıyan geri kalan → `ilan-avcisi` (`il-<id>`)
 Hiçbiri değilse (ör. `/start`, "selam") mesaj yalnızca loglanır ve patrona kısa bir yardım notu döner.
 Gelen kutusu ve Telegram offset'i `takimlar/basvuru-takip/` (postane) altında kalır — Telegram'ın tek
 bir offset'i var, takımlara bölünmez.
@@ -52,11 +52,11 @@ YONLENDIRME = [
                                        re.IGNORECASE)),
     ("fikir-atolyesi", "fk", re.compile(r"fikir", re.IGNORECASE)),
     ("voltyol-bekci", "vb", re.compile(r"voltyol|ev-rota|\bsite", re.IGNORECASE)),
-    (ILAN_TAKIM, "il", re.compile(r"[iİı]lan|\bi[sş] ara|pozisyon", re.IGNORECASE)),
+    (ILAN_TAKIM, "il", re.compile(r"[iİı]lan|\bi[sş] ara|pozisyon|\btemas\b", re.IGNORECASE)),
 ]
 KUYRUK_ONEKI = {takim: onek for takim, onek, _ in YONLENDIRME}
 YARDIM = ("Ajan Köyü buradayım. Örnekler:\n"
-          "• ilan bak (ya da bir ilan linki)\n• başvurdum 3 · Getir'den mülakat geldi\n"
+          "• ilan bak (ya da bir ilan linki) · temas 2\n• başvurdum 3 · Getir'den mülakat geldi\n"
           "• fikir: tarım\n• voltyol site nasıl")
 BEKLEME_SN = 15                     # getUpdates long-poll süresi
 TUR_ARASI_SN = 2                    # iki tur arası nefes (ağ hatasında sıkı döngüyü keser)

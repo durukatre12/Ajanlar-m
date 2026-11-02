@@ -4,7 +4,7 @@
 > İskelet: [selmakcby/a-sirketi](https://github.com/selmakcby/a-sirketi) (MIT).
 
 ## Ne bu
-- **ilan-avcisi** (Gözetleme kulesi) — hafta içi her sabah yeni junior veri analisti ilanlarını tarar, puanlar;
+- **ilan-avcisi** (Gözetleme kulesi) — her sabah yeni junior veri analisti ilanlarını tarar, puanlar, öne çıkanlara sıcak temas araması ekler;
   Telegram'dan gelen tek ilan linkini CV ile karşılaştırır.
 - **basvuru-takip** (Postane) — başvuru tablosunu tutar; "başvurdum 3", "mülakat geldi" haberlerini işler;
   takip e-postası, ön yazı ve mülakat kartı **taslağı** yazar.
