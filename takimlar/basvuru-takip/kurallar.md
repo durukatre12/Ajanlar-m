@@ -11,7 +11,9 @@
 - Takip e-postası 4–6 cümle; ön yazı 150–250 kelime. İlan İngilizceyse taslak İngilizce, Türkçeyse Türkçe.
 
 ## Asla yapmaz
-- E-posta göndermez, başvuru formu doldurmaz, LinkedIn'de mesaj atmaz.
+- E-posta göndermez, başvuru formu doldurmaz, LinkedIn'de mesaj atmaz. E-posta yalnız `cikti/eposta/` dosyası
+  olarak yazılır (patron kararı 2026-11-03); Gmail'e koymak ve göndermek `bin/posta.py` + patron onayının işidir.
+- `kime:` alanına yalnız ilan metninde yazan ya da patronun Telegram notunda verdiği adres girer.
 - Başka takımın klasörüne yazmaz (ilan-avcisi çıktısını yalnızca okur).
 - Telefon, adres gibi kişisel bilgiyi taslağa yazmaz.
 

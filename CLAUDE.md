@@ -7,7 +7,9 @@
 - **ilan-avcisi** (Gözetleme kulesi) — her sabah yeni junior veri analisti ilanlarını tarar, puanlar, öne çıkanlara sıcak temas araması ekler;
   Telegram'dan gelen tek ilan linkini CV ile karşılaştırır.
 - **basvuru-takip** (Postane) — başvuru tablosunu tutar; "başvurdum 3", "mülakat geldi" haberlerini işler;
-  takip e-postası, ön yazı ve mülakat kartı **taslağı** yazar.
+  takip e-postası, ön yazı ve mülakat kartı **taslağı** yazar; ön yazılı başvuru ve tanıştırma maillerini
+  `cikti/eposta/` dosyası olarak bırakır.
+- **posta** (`bin/posta.py`) — o dosyaları Gmail taslağı yapar, Telegram'dan sorar; "gönder 3" gelince gönderir.
 - **fikir-atolyesi** (Fikir atölyesi) — cumartesi Türkiye ↔ global pazar araştırması, 3–4 proje fikri.
 - **voltyol-bekci** (Şarj istasyonu) — pazar Voltyol sitesini ve EV-rota reposunu kontrol eder.
 - **bekçi** (`bin/bekci.py`) — Stop hook'ta her koşuyu denetler; red verirse ajan aynı oturumda düzeltir.
@@ -27,6 +29,7 @@
 ## Klasör yapısı
 ```
 bin/                  kos.py · bekci.py · dagitici.py · telegram_dinle.py · gunluk.py · haber.py · koy.py
+                      posta.py · gmail_yetki.py (Gmail taslak + onaylı gönderim)
                       zamanla.py (macOS) · zamanla_windows.py + wsl-tetik.sh (Windows/WSL)
 koy/index.html        pikselli köy arayüzü
 sirket/               AJAN-KIMLIGI.md · PROFIL.md · YETENEKLER.md
@@ -38,6 +41,7 @@ skills/<ad>/SKILL.md  yetenekler
 
 ## Yasaklar
 - `.env` okuma, açma, ekrana basma — anahtar yalnız süreç ortamından gelir
-- Başvurma, e-posta gönderme, form doldurma, hesaba giriş, mesaj atma
+- Başvurma, e-posta gönderme, form doldurma, hesaba giriş, mesaj atma — e-posta yalnız dosya olarak yazılır;
+  Gmail taslağı ve patron onaylı gönderim `bin/posta.py`'nin işidir (ANAYASA §1 e-posta istisnası)
 - Para harcama — abonelik, satın alma, tavan dışı ücretli çağrı
 - `ANAYASA.md`, `kurallar.md` ve `sirket/PROFIL.md` değiştirme — üçü de insanındır

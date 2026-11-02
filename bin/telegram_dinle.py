@@ -13,7 +13,8 @@ Dinleyici kendi başına saat ya da tavan bilmez, sorar. Mesai dışında mesaj 
 ve kuyruğa `bekliyor` düşer ama koşu başlamaz — sabah dağıtıcı alır.
 
 Yönlendirme `takim_sec`'te, tek yerde (`YONLENDIRME` tablosu, sırayla ilk eşleşen kazanır):
-  "başvurdum / mülakat / teklif / red / cevap geldi" → `basvuru-takip` (`bv-<id>`)
+  "gönder <no> / iptal <no> / taslaklar"              → ajan yok; `bin/posta.py` yanıtlar
+  "başvurdum / mülakat / teklif / red / cevap geldi / tanıştır" → `basvuru-takip` (`bv-<id>`)
   "fikir"                                           → `fikir-atolyesi` (`fk-<id>`)
   "voltyol / ev-rota / site"                        → `voltyol-bekci` (`vb-<id>`)
   "ilan" / "temas <no>" ya da link taşıyan geri kalan → `ilan-avcisi` (`il-<id>`)
@@ -40,6 +41,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import ayar  # noqa: E402
 import dagitici  # noqa: E402
+import posta  # noqa: E402
 import telegram_oku  # noqa: E402
 
 KOK = ayar.KOK
@@ -48,7 +50,8 @@ ILAN_TAKIM = "ilan-avcisi"          # linkli ve sınıflanamayan mesajın varsay
 # (takım, kuyruk öneki, desen) — sırayla; ilk eşleşen kazanır. Dış metin yorumlanmaz, yalnız desene bakılır.
 YONLENDIRME = [
     ("basvuru-takip", "bv", re.compile(r"ba[sş]vurdu|ba[sş]vuru|m[üu]lakat|g[öo]r[üu][sş]me|teklif|"
-                                       r"\bred\b|reddedil|olumsuz|cevap geldi|d[öo]n[üu][sş] (geldi|yapt)",
+                                       r"\bred\b|reddedil|olumsuz|cevap geldi|d[öo]n[üu][sş] (geldi|yapt)|"
+                                       r"tan[ıi][sş]t[ıi]r",
                                        re.IGNORECASE)),
     ("fikir-atolyesi", "fk", re.compile(r"fikir", re.IGNORECASE)),
     ("voltyol-bekci", "vb", re.compile(r"voltyol|ev-rota|\bsite", re.IGNORECASE)),
@@ -57,6 +60,7 @@ YONLENDIRME = [
 KUYRUK_ONEKI = {takim: onek for takim, onek, _ in YONLENDIRME}
 YARDIM = ("Ajan Köyü buradayım. Örnekler:\n"
           "• ilan bak (ya da bir ilan linki) · temas 2\n• başvurdum 3 · Getir'den mülakat geldi\n"
+          "• tanıştır ad@ornek.com 2 · gönder 4 · iptal 4 · taslaklar\n"
           "• fikir: tarım\n• voltyol site nasıl")
 BEKLEME_SN = 15                     # getUpdates long-poll süresi
 TUR_ARASI_SN = 2                    # iki tur arası nefes (ağ hatasında sıkı döngüyü keser)
@@ -166,7 +170,14 @@ def kostur(kok, takim):
 def isle_mesaj(kok, mesaj, simdi=None, haber=None):
     """Tek mesaj: takımını seç, kuyruğa yaz, §4 izin verirse hemen koş. (etiket, sebep) döner.
 
-    etiket: ilgisiz | kostu | bekletildi. `haber` verilirse her adım patrona Telegram'dan bildirilir."""
+    etiket: posta | ilgisiz | kostu | bekletildi. `haber` verilirse her adım patrona Telegram'dan bildirilir.
+
+    "gönder <no>" / "iptal <no>" / "taslaklar" ajana gitmez: sürücü (`bin/posta.py`) yanıtlar.
+    Gönder düğmesine basan patrondur (ANAYASA §1)."""
+    if posta.komut_mu(mesaj.get("metin")):
+        cevap = posta.komutu_isle(mesaj.get("metin"), kok=kok)
+        bildir(haber, cevap)
+        return "posta", cevap.splitlines()[0]
     takim = takim_sec(mesaj)
     if not takim:
         bildir(haber, YARDIM)

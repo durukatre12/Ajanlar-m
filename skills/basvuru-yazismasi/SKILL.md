@@ -57,11 +57,31 @@ Altına "CV'de öne çıkar" 3 madde (`skills/ilan-eslestirme` tek ilan analizi 
 İK görüşmesiyse teknik tekrar yerine: "kendini 60 sn'de anlat" iskeleti, maaş beklentisi sorusuna
 hazırlık notu (rakam önerme — patron karar verir), neden bu şirket.
 
+## 4 · Ön yazılı başvuru maili (`cikti/eposta/`, `tur: on-yazi`, `ek: cv`)
+Yalnız ilan metninde bir başvuru e-postası varsa. Gövde = ön yazının e-posta hâli, 120–200 kelime:
+selam → hangi pozisyon ve nerede gördüğün → 1–2 kanıt → "CV'mi ekte paylaşıyorum" → kapanış + imza
+(ad soyad · LinkedIn · GitHub). Konu: `<Pozisyon> başvurusu — Duru Katre Sarnıç`.
+
+## 5 · Tanıştırma ricası (`cikti/eposta/`, `tur: tanistirma`, `ek: yok`)
+Ortak tanıdığa yazılır, işe alımcıya değil. 4–6 cümle, samimi ama kısa:
+```
+Konu: Küçük bir rica — <Şirket> <Pozisyon>
+Merhaba <ad ya da boş>,
+<Şirket>'teki <Pozisyon> ilanına başvuruyorum; LinkedIn'de <Şirket>'te <rol> ekibinde
+bağlantıların olduğunu gördüm.
+Uygun görürsen ekipten biriyle kısa bir tanışma ayarlayabilir misin? Rolü ilk elden dinlemek istiyorum.
+<Tek kanıt: role en uygun proje, bir sayıyla.>
+İstersen sana iletmen için iki satırlık bir özet ve CV'mi göndereyim. Şimdiden teşekkürler!
+Duru
+```
+Çalışanın adını yazma (ANAYASA §2) — "ekipten biri" de; adı patron Gmail'de ekler.
+
 ## Kontrol listesi (her taslak)
 - [ ] Konu satırı var
 - [ ] İlana özgü en az bir cümle var
 - [ ] Profilde olmayan iddia yok
-- [ ] Telefon/adres yok, yer tutucu var
+- [ ] Telefon/adres yok, yer tutucu var — `cikti/eposta/` dosyasında yer tutucu bırakma: doldurulmamış `[...]`
+      olan mail gönderilemez; bilmediğin şeyi cümleden çıkar
 - [ ] Uzunluk sınırında
 
 ## Öğrenilenler

@@ -57,6 +57,9 @@ Windows için komut komut ayrıntılı hâli: **[KURULUM.md](KURULUM.md)**. Wind
 | `TELEGRAM_BOT_TOKEN` | Bot gelen kutusu ve özetler (@BotFather) | dinleyici açılmaz, özet gitmez; takımlar yine saatinde koşar, çıktı köyde görünür |
 | `TELEGRAM_CHAT_ID` | Yalnızca senin mesajların işlensin, özet yalnız sana gitsin | aynı |
 | `OPENAI_API_KEY` | Bekçi — ayrı model ailesi (ANAYASA §3) | **yoksa ya da geçersizse** yedek yol `claude -p --model haiku`; karar "bekçi aynı aileden — uyarı" notuyla kaydedilir |
+| `GMAIL_CLIENT_ID` · `GMAIL_CLIENT_SECRET` | Google Cloud OAuth istemcisi (KURULUM.md · Gmail) | e-posta dosyaları Gmail'e konmaz; Telegram'a "Gmail bağlı değil" gelir, taslak `cikti/eposta/`'da kalır |
+| `GMAIL_REFRESH_TOKEN` | `python3 bin/gmail_yetki.py` bir kez | aynı |
+| `GMAIL_CV_YOLU` | CV PDF'inin yolu | `ek: cv` olan mail Gmail'e konmaz |
 | `NVIDIA_API_KEY` | Ajanı Anthropic yerine NVIDIA'nın bedava modeliyle koşturmak ([docs/07](docs/07-farkli-model.md)) | hiçbir şey değişmez |
 | `NIM_MODEL` | Koşacak NIM modeli (tool-use desteklemeli) | `saglayici: nim` koşusu atlanır |
 
