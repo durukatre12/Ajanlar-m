@@ -21,7 +21,7 @@
 | `ilan-avcisi`, `basvuru-takip` | [`ilan-eslestirme`](../skills/ilan-eslestirme/SKILL.md) | Arama planı, 10 üzerinden puan tablosu, eleme kuralları, tek ilan analizi. | kendi üretimimiz | MIT |
 | `ilan-avcisi`, `fikir-atolyesi` | [`kaynak-dogrulama`](../skills/kaynak-dogrulama/SKILL.md) | Her iddiayı birincil kaynağa açıp ✅/🟡/⛔ ile sınıflar. | A Şirketi'nden uyarlandı | MIT |
 | `basvuru-takip` | [`basvuru-yazismasi`](../skills/basvuru-yazismasi/SKILL.md) | Takip e-postası, ön yazı ve mülakat kartı taslakları — gönderilmez. | kendi üretimimiz | MIT |
-| `ilan-avcisi` | [`sicak-temas`](../skills/sicak-temas/SKILL.md) | İlan açan şirkette ortak geçmişli kişilere LinkedIn arama bağlantıları + bağlantı notu taslağı — isim toplamaz, göndermez. | kendi üretimimiz | MIT |
+| `ilan-avcisi`, `basvuru-takip` | [`sicak-temas`](../skills/sicak-temas/SKILL.md) | İlan açan / başvurulan şirkette ortak geçmişli kişilere LinkedIn arama bağlantıları + bağlantı notu ve başvuru sonrası mesaj taslağı — isim toplamaz, göndermez. | kendi üretimimiz | MIT |
 | `fikir-atolyesi` | [`pazar-arastirmasi`](../skills/pazar-arastirmasi/SKILL.md) | Türkiye ↔ global araştırma planı, fikir kartı, favori seçimi. | kendi üretimimiz | MIT |
 | `voltyol-bekci` | [`site-saglik-kontrolu`](../skills/site-saglik-kontrolu/SKILL.md) | Uyanma süresini ayıran site ölçümü, commit API'si, eğilim. | kendi üretimimiz | MIT |
 
