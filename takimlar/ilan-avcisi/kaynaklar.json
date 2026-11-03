@@ -1,0 +1,16 @@
+{
+  "_not": "İlan avcısının doğrudan baktığı şirketler. 'lever': jobs.lever.co/<kimlik> adresindeki kimlik. 'sayfalar': ajanın her sabah açıp okuduğu şirket sayfaları (Kariyer.net şirket profili, kariyer sayfası). Şirket eklemek için aynı biçimde bir satır ekle.",
+  "lever": [
+    {"sirket": "Trendyol", "kimlik": "trendyol"},
+    {"sirket": "Codeway", "kimlik": "codeway"},
+    {"sirket": "Midas", "kimlik": "getmidas"},
+    {"sirket": "Insider", "kimlik": "insiderone"},
+    {"sirket": "Insider", "kimlik": "useinsider"}
+  ],
+  "sayfalar": [
+    {"sirket": "Yapı Kredi", "url": "https://www.kariyer.net/firma-profil/yapi-kredi-2108-12166"},
+    {"sirket": "Gratis", "url": "https://www.kariyer.net/firma-profil/gratis-21852-13016"},
+    {"sirket": "Watsons", "url": "https://www.kariyer.net/firma-profil/watsons-4152-45122"},
+    {"sirket": "Getir", "url": "https://careers-page.com/getir-2"}
+  ]
+}

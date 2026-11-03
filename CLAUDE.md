@@ -30,6 +30,7 @@
 ```
 bin/                  kos.py · bekci.py · dagitici.py · telegram_dinle.py · gunluk.py · haber.py · koy.py
                       posta.py · gmail_yetki.py (Gmail taslak + onaylı gönderim)
+                      ilan_cek.py (Lever ilan servislerinden günlük liste; şirketler takimlar/ilan-avcisi/kaynaklar.json)
                       zamanla.py (macOS) · zamanla_windows.py + wsl-tetik.sh (Windows/WSL)
 koy/index.html        pikselli köy arayüzü
 sirket/               AJAN-KIMLIGI.md · PROFIL.md · YETENEKLER.md
