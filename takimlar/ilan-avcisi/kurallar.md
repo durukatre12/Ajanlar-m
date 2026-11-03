@@ -7,6 +7,10 @@
 - **Her ilanın yanında açılmış bir bağlantı durur.** Koşu kaydında hangi bağlantıların açıldığı yazar.
 - Puan `skills/ilan-eslestirme` tablosuna göre verilir; "neden uygun" cümlesi profildeki somut bir
   yetkinliğe ya da projeye dayanır ("analitik düşünce" gibi boş gerekçe yazılmaz).
+- İstisna (patron kararı 2026-11-03): `veri/kaynak-ilanlar.md`'deki Lever ilanları sürücünün şirket ilan
+  servisinden çektiği canlı kayıtlardır; koşu kaydında `açıldı (API)` olarak geçer, ayrıca açılması gerekmez.
+- Patronun Telegram'dan yapıştırdığı ilan metni (`veri/ilan-metni-*.txt`) kaynak sayılır; bağlantı yoksa
+  çıktıda "kaynak: patronun yapıştırdığı metin" yazılır.
 - 3 yıldan fazla deneyim, senior/lead/manager unvanı isteyen ilan elenir.
 - İlan tarihi bilinmiyorsa "tarih bilinmiyor" yazılır; yeni gibi sunulmaz.
 - Maaş yalnızca ilanda yazıyorsa yazılır.

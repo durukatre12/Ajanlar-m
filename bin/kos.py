@@ -234,6 +234,12 @@ def kos(takim, kuru=False, zorla=False):
     isaret = calisiyor_yolu(takim)
     isaret.write_text(zaman, encoding="utf-8")
     baslangic = time.time()
+    if takim == "ilan-avcisi":   # şirketlerin ilan servislerinden taze liste (bin/ilan_cek.py)
+        try:
+            import ilan_cek
+            print(f"ilan_cek: {ilan_cek.cek()} uygun ilan")
+        except Exception as exc:  # noqa: BLE001 — kaynak çekilemezse ajan web aramasıyla devam eder
+            print(f"ilan_cek çalışmadı: {type(exc).__name__}", file=sys.stderr)
     try:
         try:
             cozum = _claude_kos(metin, fm, takim, kosu)

@@ -124,6 +124,15 @@ def kuyruk_maddesi(mesaj, takim):
     return f"{KUYRUK_ONEKI[takim]}-{mesaj['update_id']}", " · ".join(parcalar)
 
 
+def ilan_metnini_sakla(kok, mesaj):
+    """Patronun yapıştırdığı uzun ilan metnini (LinkedIn'den kopya gibi) tam hâliyle saklar.
+    Kuyruk notuna dosya yolu girer; ajan metni `<kaynak>` bloğunda, veri olarak okur."""
+    yol = Path(kok) / "takimlar" / ILAN_TAKIM / "veri" / f"ilan-metni-{mesaj['update_id']}.txt"
+    yol.parent.mkdir(parents=True, exist_ok=True)
+    yol.write_text(str(mesaj.get("not") or ""), encoding="utf-8")
+    return f"tam metin: veri/{yol.name}"
+
+
 def gelen_mesajlar(yollar):
     """`telegram_oku.isle`'nin yazdığı `gelen/*.json` dosyalarını okur; bozuk dosyayı atlar."""
     mesajlar = []
@@ -183,6 +192,8 @@ def isle_mesaj(kok, mesaj, simdi=None, haber=None):
         bildir(haber, YARDIM)
         return "ilgisiz", "hiçbir takımın deseni tutmadı — koşu başlatılmadı"
     id_, notu = kuyruk_maddesi(mesaj, takim)
+    if takim == ILAN_TAKIM and len(str(mesaj.get("not") or "")) > NOT_SINIRI:
+        notu += " · " + ilan_metnini_sakla(kok, mesaj)   # yapıştırılan uzun ilan metni kesilmesin
     dagitici.kuyruga_yaz(kok, takim, id_, notu)   # aynı id ikinci kez iş açmaz
     kossun, sebep = dagitici.tetik_karari(kok, takim, simdi or datetime.now().astimezone())
     if not kossun:
