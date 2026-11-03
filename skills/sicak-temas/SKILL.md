@@ -1,10 +1,10 @@
 ---
 name: sicak-temas
-description: İlan açan şirkette benzer rolde çalışan, patronla ortak geçmişi olan kişilere ulaşmak için hazır LinkedIn kişi araması bağlantıları ve kısa bağlantı notu taslağı üretir; isim toplamaz, giriş yapmaz, mesaj göndermez. İlan avcısı günlük taramada öne çıkan ilanlar için kullanır.
+description: İlan açan şirkette benzer rolde çalışan, patronla ortak geçmişi olan kişilere ulaşmak için hazır LinkedIn kişi araması bağlantıları ve kısa bağlantı notu taslağı üretir; isim toplamaz, giriş yapmaz, mesaj göndermez. İlan avcısı günlük taramada öne çıkan ilanlar için, postacı patron başvurdum dediğinde başvuru sonrası mesajlar için kullanır.
 kaynak: Ajan Köyü'nün kendi üretimi — dış kaynak yok
 lisans: MIT
 uyarlayan: Ajan Köyü (2026-11-03)
-takimlar: [ilan-avcisi]
+takimlar: [ilan-avcisi, basvuru-takip]
 ---
 
 # Sıcak temas
@@ -36,6 +36,30 @@ Patron Telegram'dan "temas <no>" yazarsa o numaralı ilan için de.
    Ortak geçmiş satırını aramaya göre seç: İTÜ → "İTÜ Şehir ve Bölge Planlama mezunuyum",
    Workintech → "Workintech veri analitiği programını yeni bitirdim", 2. derece → ortak tanıdığı patron yazar: `[ortak bağlantı]`.
 4. Çıktıda ilanın altına `Sıcak temas` bloğunu ekle (şablon aşağıda).
+
+## Başvuru sonrası LinkedIn mesajları (postacı)
+Patron başvurdu; amaç o ekipte çalışan biriyle tanışıp "sizinle çalışmak istiyorum"u söylemek.
+Çıktıda şu sırayla, düz metin:
+```
+<Şirket> — <Pozisyon> · başvuru <tarih>
+
+Kimi ara (aynı rol / ekip lideri, öncelik ortak geçmiş):
+İTÜ: <url>
+Workintech: <url>
+2. derece: <url>
+
+1) Bağlantı notu (≤200 karakter):
+<metin>
+
+2) Kabul edince mesaj (500–700 karakter):
+<metin>
+```
+**Bağlantı notu:** ortak geçmiş + "başvurdum" + tek soru. Örn: "Merhaba [ad], İTÜ Şehir ve Bölge Planlama
+mezunuyum. <Şirket>'teki <rol> pozisyonuna başvurdum; ekibinizi tanımak isterim. Bağlantı kurabilir miyiz?"
+**Kabul sonrası mesaj:** (1) teşekkür + neden bu ekip — ilandan somut bir iş; (2) role en uygun tek kanıt, bir
+sayıyla (`skills/basvuru-yazismasi` rol → kanıt tablosu); (3) "<Pozisyon>'a başvurdum, ekibinizde çalışmayı çok
+isterim"; (4) 15 dakikalık sohbet ricası; (5) referans **isteme** — sohbet açılmadan değil. İmza: Duru.
+İlan İngilizceyse ikisi de İngilizce. `[ad]` dışında yer tutucu bırakma.
 
 ## Not şablonu
 ```

@@ -251,6 +251,9 @@ def kos(takim, kuru=False, zorla=False):
     finally:
         isaret.unlink(missing_ok=True)
     haber.gonder(haber.kosu_haberi(takim, sonuc, baslangic))
+    if sonuc == "tamam":
+        for ek in haber.ek_haberler(takim, baslangic):
+            haber.gonder(ek)
     if takim == "basvuru-takip":   # e-posta dosyaları → Gmail taslağı + Telegram onayı (bin/posta.py)
         try:
             import posta

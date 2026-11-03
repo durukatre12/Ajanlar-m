@@ -56,6 +56,31 @@ def ozet_paragrafi(yol):
     return " ".join(paragraf)
 
 
+TELEGRAM_BOLUMLERI = ("LinkedIn mesajları",)   # çıktıda varsa patrona ayrıca, olduğu gibi gider
+
+
+def bolum(yol, baslik):
+    """Çıktıdaki `## <baslik>` bölümünün metni (bir sonraki `## `'ye kadar); yoksa boş."""
+    try:
+        metin = Path(yol).read_text(encoding="utf-8")
+    except OSError:
+        return ""
+    parcalar = metin.split(f"\n## {baslik}", 1)
+    if len(parcalar) < 2:
+        return ""
+    govde = parcalar[1].split("\n", 1)[1] if "\n" in parcalar[1] else ""
+    return govde.split("\n## ", 1)[0].strip()
+
+
+def ek_haberler(takim, baslangic_ts, kok=None):
+    """Özetten ayrı gönderilecek bölümler (ör. kopyalanacak LinkedIn mesajları)."""
+    cikti = yeni_cikti(takim, baslangic_ts, kok)
+    if cikti is None:
+        return []
+    return [f"{ROZET.get(takim, '•')} {baslik}\n\n{govde}" for baslik in TELEGRAM_BOLUMLERI
+            if (govde := bolum(cikti, baslik))]
+
+
 def yeni_cikti(takim, baslangic_ts, kok=None):
     """Koşu başladıktan sonra yazılmış en yeni çıktı dosyası; yoksa None."""
     dizin = Path(kok or ayar.KOK) / "takimlar" / takim / "cikti"
